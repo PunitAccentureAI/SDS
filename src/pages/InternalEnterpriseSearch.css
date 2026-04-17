@@ -1,0 +1,696 @@
+.ies-page {
+  display: flex;
+  min-height: 100vh;
+  background: #ffffff;
+  color: #1d1d1f;
+  position: relative;
+}
+
+.ies-page--embedded {
+  min-height: 100%;
+  height: 100%;
+  flex-direction: column;
+}
+
+.ies-embedded-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  padding: 0 40px;
+  border-bottom: 1px solid #e8e9ee;
+  font-size: 14px;
+  font-weight: 700;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.ies-embedded-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.ies-embedded-close:hover {
+  background: #f4f5f7;
+}
+
+.ies-sidebar-toggle-area {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 72px;
+  padding: 8px 6px 24px;
+  z-index: 10;
+  opacity: 0.8;
+}
+
+.ies-sidebar-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 48px;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.ies-sidebar-toggle:hover {
+  background-color: #f4f5f7;
+}
+
+.ies-shell,
+.ies-detail-shell {
+  flex: 1;
+  padding: 96px 64px 60px;
+}
+
+.ies-page--embedded .ies-shell,
+.ies-page--embedded .ies-detail-shell {
+  min-height: 0;
+  overflow-y: auto;
+  padding-top: 48px;
+}
+
+.ies-title,
+.ies-detail-title {
+  margin: 0;
+  font-size: 38px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.ies-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-top: 112px;
+}
+
+.ies-search {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 56px;
+  padding: 0 16px;
+  background: #f7f7f7;
+  border-radius: 100px;
+}
+
+.ies-search input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 16px;
+  color: #3a3a49;
+}
+
+.ies-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.ies-menu-anchor {
+  position: relative;
+}
+
+.ies-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 56px;
+  padding: 0 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  color: #000;
+}
+
+.ies-sort-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 220px;
+  border: 1px solid #e8e9ee;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 4px 24px rgba(29, 29, 31, 0.12);
+  overflow: hidden;
+  z-index: 40;
+}
+
+.ies-sort-option {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 16px;
+  border: none;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+  color: #1d1d1f;
+  text-align: left;
+}
+
+.ies-sort-option + .ies-sort-option {
+  border-top: 1px solid #f1f2f4;
+}
+
+.ies-sort-option.active {
+  background: #f7f9fc;
+  font-weight: 700;
+}
+
+.ies-sort-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  background: #1d1d1f;
+}
+
+.ies-filter-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border-radius: 16px;
+  background: #000;
+  color: #fff;
+  font-size: 12px;
+}
+
+.ies-selected-filters-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  width: 930px;
+  max-width: 100%;
+  margin-top: 20px;
+}
+
+.ies-selected-filter-chip {
+  margin-top: 0;
+  gap: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.ies-selected-filter-chip svg {
+  flex-shrink: 0;
+}
+
+.ies-results-count {
+  margin-top: 56px;
+  font-size: 14px;
+  color: #000;
+}
+
+.ies-results {
+  margin-top: 24px;
+  width: 930px;
+  max-width: 100%;
+}
+
+.ies-result-card {
+  padding: 16px 0 24px;
+  border-bottom: 1px solid #eee;
+}
+
+.ies-result-title {
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 18px;
+  font-weight: 700;
+  color: #000;
+  text-align: left;
+}
+
+.ies-result-title:hover {
+  color: #2189ff;
+  text-decoration: underline;
+}
+
+.ies-result-meta {
+  margin-top: 16px;
+  font-size: 12px;
+  color: #000;
+}
+
+.ies-result-summary {
+  margin: 16px 0 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #000;
+  max-width: 822px;
+}
+
+.ies-result-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.ies-tag {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 100px;
+  background: #eee;
+  color: #313131;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.ies-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 20px;
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: 14px;
+  color: #000;
+}
+
+.ies-detail-id {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #555;
+}
+
+.ies-detail-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 36px;
+}
+
+.ies-stat-card,
+.ies-panel {
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  background: #fff;
+}
+
+.ies-stat-card {
+  min-height: 132px;
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.ies-stat-card span {
+  font-size: 14px;
+  color: #555;
+}
+
+.ies-stat-card strong {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.ies-panel {
+  margin-top: 20px;
+  padding: 16px;
+}
+
+.ies-panel h2 {
+  margin: 0 0 16px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.ies-panel p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #555;
+  max-width: 600px;
+}
+
+.ies-file-header,
+.ies-file-row {
+  display: grid;
+  grid-template-columns: 1fr 240px;
+  gap: 16px;
+  align-items: center;
+}
+
+.ies-file-header {
+  padding: 8px 16px 12px;
+  font-size: 12px;
+  color: #9fa8b8;
+}
+
+.ies-file-row {
+  padding: 16px;
+  border-top: 1px solid #eee;
+}
+
+.ies-file-name,
+.ies-file-actions {
+  display: flex;
+  align-items: center;
+}
+
+.ies-file-name {
+  gap: 12px;
+  font-size: 14px;
+}
+
+.ies-file-actions {
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+  color: #555;
+}
+
+.ies-file-menu-wrap {
+  position: relative;
+}
+
+.ies-file-menu-btn {
+  border: none;
+  background: none;
+  padding: 0;
+}
+
+.ies-file-menu {
+  position: absolute;
+  top: 24px;
+  right: 0;
+  min-width: 140px;
+  border: 1px solid #e8e9ee;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 4px 24px rgba(29, 29, 31, 0.12);
+  overflow: hidden;
+}
+
+.ies-file-menu button {
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  font-size: 14px;
+  color: #1d1d1f;
+}
+
+.ies-file-menu button + button {
+  border-top: 1px solid #f0f0f0;
+}
+
+.ies-detail-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 18px;
+}
+
+.ies-use-btn,
+.ies-add-btn,
+.ies-cancel-btn {
+  height: 50px;
+  padding: 0 20px;
+  border-radius: 100px;
+  font-size: 14px;
+  font-weight: 700;
+  border: none;
+}
+
+.ies-use-btn,
+.ies-add-btn {
+  background: #000;
+  color: #fff;
+}
+
+.ies-cancel-btn {
+  background: #f4f5f7;
+  color: #1d1d1f;
+}
+
+.ies-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(29, 29, 31, 0.2);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: flex;
+  justify-content: flex-end;
+  align-items: stretch;
+  z-index: 2000;
+}
+
+.ies-modal {
+  width: 960px;
+  max-width: 100%;
+  height: 100%;
+  background: #fff;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  overflow-y: auto;
+  animation: iesSlideInRight 0.3s ease;
+}
+
+@keyframes iesSlideInRight {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+.ies-modal-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  padding: 0 40px;
+  border-bottom: 1px solid #e8e9ee;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.ies-modal-topbar button {
+  border: none;
+  background: none;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.ies-modal-body {
+  padding: 32px 60px 40px;
+}
+
+.ies-modal-text {
+  font-size: 14px;
+  color: #000;
+  line-height: 1.7;
+  max-width: 740px;
+}
+
+.ies-reference-card,
+.ies-proposal-list {
+  margin-top: 24px;
+  padding: 24px 20px;
+  border: 1px solid #e8e9ee;
+  background: #fff;
+}
+
+.ies-reference-card {
+  border-color: #e8e9ee;
+  border-radius: 20px;
+  min-height: 124px;
+}
+
+.ies-proposal-list {
+  border-radius: 20px;
+}
+
+.ies-reference-card h3,
+.ies-proposal-list-title span {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.ies-reference-meta,
+.ies-proposal-list-hint {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #555;
+}
+
+.ies-reference-card .ies-result-tags {
+  margin-top: 8px;
+}
+
+.ies-proposal-list-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ies-proposal-items {
+  margin-top: 20px;
+}
+
+.ies-proposal-files-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 180px 16px;
+  align-items: center;
+  column-gap: 24px;
+  padding: 0 16px 12px;
+  font-size: 12px;
+  color: #9fa8b8;
+}
+
+.ies-proposal-head {
+  padding: 0 16px 12px;
+  font-size: 12px;
+  color: #9fa8b8;
+}
+
+.ies-proposal-file-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 16px;
+  align-items: center;
+  column-gap: 24px;
+  min-height: 60px;
+  padding: 20px 16px;
+  border-top: 1px solid #e8e9ee;
+  position: relative;
+  cursor: pointer;
+}
+
+.ies-proposal-file-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 180px;
+  align-items: center;
+  column-gap: 24px;
+  min-width: 0;
+}
+
+.ies-proposal-file-date {
+  font-size: 12px;
+  line-height: 1.4;
+  color: #555;
+  white-space: nowrap;
+}
+
+.ies-proposal-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 60px;
+  padding: 20px 16px;
+  border-top: 1px solid #e8e9ee;
+  position: relative;
+  cursor: pointer;
+}
+
+.ies-proposal-item-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.ies-proposal-radio-input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ies-proposal-radio {
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid #1d1d1f;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: #fff;
+}
+
+.ies-proposal-radio.checked {
+  background: #1d1d1f;
+}
+
+.ies-proposal-radio--round {
+  border-radius: 50%;
+}
+
+.ies-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 0 60px 40px;
+}
+
+.ies-add-btn {
+  min-width: 143px;
+  height: 50px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 999px;
+  background: #000;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+@media (max-width: 1100px) {
+  .ies-shell,
+  .ies-detail-shell {
+    padding: 48px 24px;
+  }
+
+  .ies-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    margin-top: 48px;
+  }
+
+  .ies-selected-filters-row {
+    width: 100%;
+  }
+
+  .ies-detail-stats,
+  .ies-file-header,
+  .ies-file-row {
+    grid-template-columns: 1fr;
+  }
+}

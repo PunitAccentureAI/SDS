@@ -1,0 +1,149 @@
+.settings-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #ffffff;
+}
+
+.settings-page {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+}
+
+/* ───── Sidebar toggle ───── */
+.settings-sidebar-toggle-area {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 72px;
+  padding: 8px 6px 24px;
+  z-index: 10;
+  opacity: 0.8;
+}
+
+.settings-sidebar-toggle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 48px;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.settings-sidebar-toggle:hover {
+  background-color: #f4f5f7;
+}
+
+/* ───── Content ───── */
+.settings-content {
+  max-width: 1248px;
+  margin: 0 auto;
+  padding: 100px 64px 64px;
+}
+
+/* ───── Header ───── */
+.settings-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.settings-title {
+  font-size: 38px;
+  font-weight: 700;
+  color: #000000;
+  margin: 0;
+  line-height: 1;
+}
+
+.settings-header-divider {
+  height: 1px;
+  background-color: #e8e9ee;
+  margin-bottom: 48px;
+}
+
+/* ───── Body ───── */
+.settings-body {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.settings-section {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 48px;
+}
+
+.settings-section-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #000000;
+  margin: 0;
+  line-height: 1;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.settings-cards {
+  width: 823px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.settings-card {
+  display: flex;
+  align-items: center;
+  gap: 48px;
+  padding: 24px;
+  background: none;
+  border: 1px solid #9fa8b8;
+  border-radius: 20px;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.settings-card:hover {
+  background-color: #f9f9fb;
+  border-color: #5a5d6e;
+}
+
+.settings-card-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.settings-card-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #000000;
+  line-height: 1;
+}
+
+.settings-card-desc {
+  font-size: 14px;
+  font-weight: 400;
+  color: #9fa8b8;
+  line-height: 1.7;
+}
+
+.settings-card-arrow {
+  flex-shrink: 0;
+}
+
+.settings-section-divider {
+  height: 1px;
+  background-color: #e8e9ee;
+}

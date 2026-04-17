@@ -1,0 +1,226 @@
+{
+  "common": {
+    "login": "로그인",
+    "logout": "로그아웃",
+    "save": "저장",
+    "cancel": "취소",
+    "back": "뒤로",
+    "search": "검색",
+    "dismiss": "닫기",
+    "approve": "승인",
+    "deny": "거부",
+    "goBack": "뒤로 가기",
+    "backToLogin": "로그인으로 돌아가기",
+    "loading": "로딩 중...",
+    "saved": "저장됨"
+  },
+  "brand": {
+    "samsungSds": "SAMSUNG SDS",
+    "proposalBuilder": "SDS 제안서 빌더"
+  },
+  "login": {
+    "title1": "로그인",
+    "title2": "SDS 제안서 빌더",
+    "email": "이메일",
+    "password": "비밀번호",
+    "loginBtn": "로그인",
+    "noAccount": "계정이 없으신가요?",
+    "requestAccess": "접근 요청",
+    "invalidCredentials": "입력하신 사용자 이름 또는 비밀번호가 올바르지 않습니다. 계정 접근에 대한 도움이 필요하시면 관리자에게 문의하세요.",
+    "expiredUser": "이 사용자는 만료되었습니다.",
+    "contactUs": "문의하기",
+    "expiredSuffix": "계정 접근에 대한 도움을 받으세요.",
+    "footer": "승인된 삼성 직원만 이용 가능합니다."
+  },
+  "requestAccess": {
+    "title1": "접근 요청",
+    "title2": "SDS 제안서 빌더",
+    "firstName": "이름",
+    "lastName": "성",
+    "chooseIndustry": "산업 선택",
+    "requestBtn": "접근 요청",
+    "hasAccount": "이미 계정이 있으신가요?",
+    "loginLink": "로그인"
+  },
+  "contactAdmin": {
+    "title": "관리자에게 문의",
+    "message": "요청이 전송되었습니다. 접근 확인을 위해 관리자에게 연락하세요:",
+    "email": "proposal.builder@samsung.com",
+    "suffix": ""
+  },
+  "home": {
+    "greeting": "{{greeting}}, {{name}}",
+    "goodMorning": "좋은 아침이에요",
+    "goodAfternoon": "좋은 오후에요",
+    "goodEvening": "좋은 저녁이에요",
+    "createNew": "새 제안서 만들기",
+    "noProposals": "아직 제안서가 없습니다",
+    "proposals": "제안서",
+    "results": "{{count}}개 결과",
+    "sort": "정렬",
+    "filter": "필터",
+    "clearAll": "전체 삭제",
+    "searchPlaceholder": "제안서 및 자격 검색",
+    "home": "홈"
+  },
+  "proposal": {
+    "lastEdited": "마지막 수정",
+    "enterpriseSearch": "기업 검색",
+    "saveClose": "저장 후 닫기",
+    "setup": "설정",
+    "aiChat": "AI 채팅",
+    "details": "세부 정보",
+    "outline": "개요",
+    "documents": "문서",
+    "proposalCreation": "제안서 작성"
+  },
+  "enterpriseSearch": {
+    "title": "기업 검색",
+    "searchPlaceholder": "제안서 및 자격 증명을 검색하세요",
+    "resultsFound": "개의 결과를 찾았습니다",
+    "client": "고객",
+    "year": "연도",
+    "dealSize": "딜 규모",
+    "relevance": "관련성",
+    "overview": "개요",
+    "files": "파일",
+    "fileName": "이름",
+    "dateUpdated": "업데이트 날짜",
+    "preview": "미리보기",
+    "download": "다운로드",
+    "sortByRelevance": "관련도순 정렬",
+    "sortByNameAsc": "이름 오름차순",
+    "sortByNameDesc": "이름 내림차순",
+    "useInProposal": "제안서에 사용",
+    "addToProposal": "제안서에 추가",
+    "addReferencePrompt": "\"{{name}}\"를 진행 중인 제안서에 추가",
+    "openProposalCount": "열린 제안서 {{count}}개",
+    "selectProposal": "이 레퍼런스를 추가할 제안서를 선택하세요",
+    "addedFromSearch": "{{name}}가 기업 검색에서 추가되었습니다"
+  },
+  "createProposal": {
+    "title": "새 제안서 만들기",
+    "heading": "제안서 작성을 시작합시다",
+    "subtext": "분석 및 제안서 작성을 시작하려면 RFP 문서를 업로드하세요",
+    "uploadLabel": "RFP를 드래그 앤 드롭하세요",
+    "uploadOr": "또는",
+    "uploading": "파일 업로드 중",
+    "browseFiles": "파일 찾아보기",
+    "addDetails": "세부 정보 추가",
+    "proposalName": "제안서 이름",
+    "proposalNamePlaceholder": "제안서 이름을 입력하세요",
+    "opportunityId": "기회 ID",
+    "opportunityIdPlaceholder": "기회 ID를 입력하세요",
+    "clientName": "고객 이름",
+    "industry": "산업",
+    "industryPlaceholder": "산업을 선택하세요",
+    "service": "서비스 부문",
+    "servicePlaceholder": "서비스 부문을 선택하세요",
+    "internalExternal": "내부/외부",
+    "internalExternalPlaceholder": "내부/외부를 선택하세요",
+    "projectGoal": "프로젝트 목표 / 설명",
+    "optional": "(선택사항)",
+    "projectGoalPlaceholder": "프로젝트 목표 / 설명을 입력하세요",
+    "submissionDate": "제출 날짜",
+    "createBtn": "만들기",
+    "proposalNameExists": "같은 이름의 제안서가 이미 존재합니다.",
+    "requiredField": "이 필드는 필수입니다.",
+    "singleFileOnly": "파일은 하나만 업로드할 수 있습니다."
+  },
+  "profile": {
+    "title": "프로필",
+    "basicInfo": "기본 정보",
+    "firstName": "이름",
+    "lastName": "성",
+    "email": "이메일",
+    "industry": "산업",
+    "userType": "사용자 유형"
+  },
+  "settings": {
+    "title": "설정",
+    "platform": "플랫폼",
+    "manageUsers": "사용자 관리",
+    "manageUsersDesc": "사용자 계정과 권한을 추가, 편집 및 관리합니다."
+  },
+  "manageUsers": {
+    "title": "사용자 관리",
+    "searchPlaceholder": "사용자 검색...",
+    "name": "이름",
+    "email": "이메일",
+    "userType": "사용자 유형",
+    "industry": "산업",
+    "status": "상태"
+  },
+  "userDetail": {
+    "title": "사용자 정보 수정",
+    "requestMsg": "{{name}}님이 SDS 제안서 빌더 접근을 요청했습니다",
+    "firstName": "이름",
+    "lastName": "성",
+    "email": "이메일",
+    "userType": "사용자 유형",
+    "industry": "산업",
+    "status": "상태",
+    "saveBtn": "사용자 정보 저장",
+    "approvedToast": "\"{{name}}\"님의 접근이 승인되었습니다",
+    "deniedToast": "\"{{name}}\"님의 접근이 거부되었습니다"
+  },
+  "notFound": {
+    "code": "404",
+    "title": "페이지를 찾을 수 없습니다",
+    "subtitle": "요청하신 페이지를 사용할 수 없습니다.",
+    "description": "요청을 처리하는 데 문제가 발생했습니다. 오래된 북마크에서 방문하거나 잘못된 링크를 사용하고 있을 수 있습니다."
+  },
+  "sessionExpired": {
+    "title": "세션이 만료되었습니다",
+    "description": "비활성 상태로 인해 로그아웃되었습니다. 계속하려면 다시 로그인하세요."
+  },
+  "loader": {
+    "message": "제안서 빌더 로딩 중..."
+  },
+  "industries": {
+    "thePublic": "공공",
+    "nationalDefence": "국방",
+    "finance": "금융",
+    "manufacturing": "제조",
+    "service": "서비스",
+    "medicalCare": "의료",
+    "logistics": "물류"
+  },
+  "proposalCreation": {
+    "toastSuccess": "\"{{name}}\"이(가) 성공적으로 생성되었습니다.",
+    "lastEditedToday": "오늘 마지막 수정",
+    "uploaded": "업로드됨",
+    "aiGreeting": "안녕하세요, {{name}}님! 정보를 제공해 주셔서 감사합니다.",
+    "aiQuestion": "시작하기 전에 어떤 유형의 제안서를 작성하시겠습니까?",
+    "replyPlaceholder": "답변...",
+    "yes": "예",
+    "no": "아니오",
+    "docMenuAria": "문서 작업",
+    "docMenuPreview": "미리보기",
+    "docMenuDownload": "다운로드",
+    "docMenuDelete": "삭제",
+    "docEmptyTitle": "첨부된 문서가 없습니다",
+    "docEmptyHint": "AI 채팅 탭에서 파일을 업로드하면 여기에 표시됩니다.",
+    "outlineExpand": "섹션 펼치기",
+    "outlineCollapse": "섹션 접기",
+    "outlineBusinessRequirements": "비즈니스 요구사항",
+    "outlineFunctionalRequirements": "기능 요구사항",
+    "outlineDataIngestion": "데이터 수집 및 전처리",
+    "outlineModelTraining": "모델 학습 및 배포",
+    "outlinePredictionAnalytics": "예측 및 분석 서비스",
+    "outlineUserInterfaces": "사용자 인터페이스",
+    "outlineSectionName": "섹션 이름"
+  },
+  "welcome": {
+    "recents": "최근"
+  },
+  "nav": {
+    "recents": "최근",
+    "seeAll": "전체 보기"
+  },
+  "statuses": {
+    "active": "활성",
+    "pending": "대기 중",
+    "inactive": "비활성"
+  }
+}

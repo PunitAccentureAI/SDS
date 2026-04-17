@@ -1,0 +1,229 @@
+.welcome-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.welcome-page {
+  position: relative;
+  min-height: 100vh;
+  background-color: #ffffff;
+  overflow: hidden;
+  flex: 1;
+}
+
+/* Gradient background — soft blue wash */
+.welcome-bg-gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 780px;
+  background: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #e8f0fe 25%,
+    #d0e2fd 45%,
+    #e8f0fe 65%,
+    #ffffff 100%
+  );
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* White fade at bottom of gradient */
+.welcome-bg-fade {
+  position: absolute;
+  top: 452px;
+  left: 0;
+  width: 100%;
+  height: 327px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, #ffffff 76%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Header */
+.welcome-header {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px 16px 24px;
+  height: 64px;
+}
+
+.welcome-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.welcome-sidebar-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  opacity: 0.8;
+}
+
+.welcome-sidebar-toggle:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.welcome-logo {
+  height: 20px;
+  width: auto;
+  object-fit: contain;
+}
+
+.welcome-header-right {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Main content */
+.welcome-main {
+  position: relative;
+  z-index: 1;
+  padding: 80px 64px 64px 64px;
+}
+
+.welcome-greeting {
+  font-size: 48px;
+  font-weight: 700;
+  color: #3a3a49;
+  line-height: 1.07;
+  margin-bottom: 24px;
+  letter-spacing: 0;
+}
+
+/* Create button */
+.welcome-create-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  height: 48px;
+  background-color: #2189ff;
+  color: #ffffff;
+  border: none;
+  border-radius: 1000px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0px 2px 7px 0px rgba(53, 77, 104, 0.32);
+  transition: background-color 0.2s ease;
+}
+
+.welcome-create-btn:hover {
+  background-color: #1a75e0;
+}
+
+.welcome-create-btn:active {
+  background-color: #1565c0;
+}
+
+/* Recents section */
+.welcome-recents {
+  margin-top: 80px;
+}
+
+.welcome-recents-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #3a3a49;
+  margin: 0 0 24px 0;
+  line-height: 1;
+}
+
+.welcome-recents-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+/* Recent proposal card */
+.welcome-card {
+  background-color: #f4f5f7;
+  border-radius: 12px;
+  box-shadow: 0px 4px 10px -2px #d7d7d7;
+  overflow: hidden;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease, transform 0.15s ease;
+}
+
+.welcome-card:hover {
+  box-shadow: 0px 6px 16px -2px #c0c0c0;
+  transform: translateY(-2px);
+}
+
+.welcome-card-thumb {
+  width: 100%;
+  height: 147px;
+  padding: 16px 16px 0 16px;
+}
+
+.welcome-card-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+  display: block;
+}
+
+.welcome-card-thumb-empty {
+  width: 100%;
+  height: 100%;
+  background-color: #ffffff;
+  border-radius: 4px;
+}
+
+.welcome-card-info {
+  padding: 16px;
+}
+
+.welcome-card-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #000000;
+  margin: 0 0 4px 0;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.welcome-card-client {
+  font-size: 12px;
+  font-weight: 600;
+  color: #757575;
+  margin: 0 0 4px 0;
+  line-height: 1.33;
+}
+
+.welcome-card-updated {
+  font-size: 12px;
+  font-weight: 600;
+  color: #757575;
+  margin: 0;
+  line-height: 1.33;
+}
+
+@media (max-width: 1200px) {
+  .welcome-recents-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .welcome-recents-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

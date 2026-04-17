@@ -1,0 +1,226 @@
+{
+  "common": {
+    "login": "Login",
+    "logout": "Logout",
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Back",
+    "search": "Search",
+    "dismiss": "Dismiss",
+    "approve": "Approve",
+    "deny": "Deny",
+    "goBack": "Go Back",
+    "backToLogin": "Back to login",
+    "loading": "Loading...",
+    "saved": "Saved"
+  },
+  "brand": {
+    "samsungSds": "SAMSUNG SDS",
+    "proposalBuilder": "SDS Proposal Builder"
+  },
+  "login": {
+    "title1": "Login to",
+    "title2": "SDS Proposal Builder",
+    "email": "Email",
+    "password": "Password",
+    "loginBtn": "Login",
+    "noAccount": "Don't have an account?",
+    "requestAccess": "Request access",
+    "invalidCredentials": "The username or password you have entered is invalid. Please contact admin for assistance in accessing your account.",
+    "expiredUser": "This user has expired. Please",
+    "contactUs": "contact us",
+    "expiredSuffix": "for assistance in accessing your account.",
+    "footer": "Available to approved Samsung employees only."
+  },
+  "requestAccess": {
+    "title1": "Request Access to",
+    "title2": "SDS Proposal Builder",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "chooseIndustry": "Choose Industry",
+    "requestBtn": "Request Access",
+    "hasAccount": "Already have an account?",
+    "loginLink": "Login"
+  },
+  "contactAdmin": {
+    "title": "Contact Admin",
+    "message": "We've sent your request. Please contact the admin at",
+    "email": "proposal.builder@samsung.com",
+    "suffix": "to confirm access."
+  },
+  "home": {
+    "greeting": "{{greeting}}, {{name}}",
+    "goodMorning": "Good morning",
+    "goodAfternoon": "Good afternoon",
+    "goodEvening": "Good evening",
+    "createNew": "Create new proposal",
+    "noProposals": "No proposals yet",
+    "proposals": "Proposals",
+    "results": "{{count}} results",
+    "sort": "Sort",
+    "filter": "Filter",
+    "clearAll": "Clear all",
+    "searchPlaceholder": "Search proposals and credentials",
+    "home": "Home"
+  },
+  "proposal": {
+    "lastEdited": "Last edited",
+    "enterpriseSearch": "Enterprise Search",
+    "saveClose": "Save & Close",
+    "setup": "Setup",
+    "aiChat": "AI Chat",
+    "details": "Details",
+    "outline": "Outline",
+    "documents": "Documents",
+    "proposalCreation": "Proposal Creation"
+  },
+  "enterpriseSearch": {
+    "title": "Enterprise Search",
+    "searchPlaceholder": "Search proposals and credentials",
+    "resultsFound": "Result(s) found",
+    "client": "Client",
+    "year": "Year",
+    "dealSize": "Deal Size",
+    "relevance": "Relevance",
+    "overview": "Overview",
+    "files": "Files",
+    "fileName": "Name",
+    "dateUpdated": "Date updated",
+    "preview": "Preview",
+    "download": "Download",
+    "sortByRelevance": "Sort by relevance",
+    "sortByNameAsc": "Name A-Z",
+    "sortByNameDesc": "Name Z-A",
+    "useInProposal": "Use in proposal",
+    "addToProposal": "Add to proposal",
+    "addReferencePrompt": "Add \"{{name}}\" to an active proposal",
+    "openProposalCount": "{{count}} open proposal",
+    "selectProposal": "Select a proposal to add this reference",
+    "addedFromSearch": "{{name}} has been added from enterprise search"
+  },
+  "createProposal": {
+    "title": "Create new proposal",
+    "heading": "Let's start building a proposal",
+    "subtext": "Upload the RFP document to begin analysis and proposal creation",
+    "uploadLabel": "Drag and drop your RFP",
+    "uploadOr": "or",
+    "uploading": "Uploading files",
+    "browseFiles": "Browse files",
+    "addDetails": "Add details",
+    "proposalName": "Proposal name",
+    "proposalNamePlaceholder": "Type proposal name here",
+    "opportunityId": "Opportunity ID",
+    "opportunityIdPlaceholder": "Type opportunity ID here",
+    "clientName": "Client name",
+    "industry": "Industry",
+    "industryPlaceholder": "Choose industry",
+    "service": "Service Segment",
+    "servicePlaceholder": "Choose service segment",
+    "internalExternal": "Internal/External",
+    "internalExternalPlaceholder": "Choose internal/external",
+    "projectGoal": "Project goal / description",
+    "optional": "(Optional)",
+    "projectGoalPlaceholder": "Type project goal / description here",
+    "submissionDate": "Submission date",
+    "createBtn": "Create",
+    "proposalNameExists": "A proposal with the same name already exists.",
+    "requiredField": "This field is required.",
+    "singleFileOnly": "You can upload only one file."
+  },
+  "profile": {
+    "title": "Profile",
+    "basicInfo": "Basic info",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "industry": "Industry",
+    "userType": "User type"
+  },
+  "settings": {
+    "title": "Settings",
+    "platform": "Platform",
+    "manageUsers": "Manage users",
+    "manageUsersDesc": "Add, edit, and manage user accounts and permissions."
+  },
+  "manageUsers": {
+    "title": "Manage users",
+    "searchPlaceholder": "Search users...",
+    "name": "Name",
+    "email": "Email",
+    "userType": "User type",
+    "industry": "Industry",
+    "status": "Status"
+  },
+  "userDetail": {
+    "title": "Update user details",
+    "requestMsg": "{{name}} has requested access to SDS Proposal Builder",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "userType": "User type",
+    "industry": "Industry",
+    "status": "Status",
+    "saveBtn": "Save user details",
+    "approvedToast": "\"{{name}}\" access has been approved",
+    "deniedToast": "\"{{name}}\" access has been denied"
+  },
+  "notFound": {
+    "code": "404",
+    "title": "Page Not Found",
+    "subtitle": "The page you've requested is not available.",
+    "description": "Sorry, we are having a problem executing your request. You may be visiting us from an old bookmark or using a broken link."
+  },
+  "sessionExpired": {
+    "title": "Your session has expired",
+    "description": "You've been signed out due to inactivity. Please log in again to continue."
+  },
+  "loader": {
+    "message": "Loading Proposal Builder..."
+  },
+  "industries": {
+    "thePublic": "The Public",
+    "nationalDefence": "National Defence",
+    "finance": "Finance",
+    "manufacturing": "Manufacturing",
+    "service": "Service",
+    "medicalCare": "Medical Care",
+    "logistics": "Logistics"
+  },
+  "proposalCreation": {
+    "toastSuccess": "\"{{name}}\" is created successfully.",
+    "lastEditedToday": "Last edited today",
+    "uploaded": "Uploaded",
+    "aiGreeting": "Hey, {{name}}!  Thank you for providing that information.",
+    "aiQuestion": "Before we start what type of proposal do you want to create?",
+    "replyPlaceholder": "Reply...",
+    "yes": "Yes",
+    "no": "No",
+    "docMenuAria": "Document actions",
+    "docMenuPreview": "Preview",
+    "docMenuDownload": "Download",
+    "docMenuDelete": "Delete",
+    "docEmptyTitle": "No documents attached",
+    "docEmptyHint": "Upload files from the AI Chat tab to see them here.",
+    "outlineExpand": "Expand section",
+    "outlineCollapse": "Collapse section",
+    "outlineBusinessRequirements": "Business Requirements",
+    "outlineFunctionalRequirements": "Functional Requirements",
+    "outlineDataIngestion": "Data Ingestion & Pre-processing",
+    "outlineModelTraining": "Model Training & Deployment",
+    "outlinePredictionAnalytics": "Prediction & Analytics Services",
+    "outlineUserInterfaces": "User Interfaces",
+    "outlineSectionName": "Section name"
+  },
+  "welcome": {
+    "recents": "Recents"
+  },
+  "nav": {
+    "recents": "RECENTS",
+    "seeAll": "See all"
+  },
+  "statuses": {
+    "active": "Active",
+    "pending": "Pending",
+    "inactive": "Inactive"
+  }
+}

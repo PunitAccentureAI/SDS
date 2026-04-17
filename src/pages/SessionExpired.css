@@ -1,0 +1,68 @@
+.se-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(29, 29, 31, 0.2);
+  backdrop-filter: blur(20px);
+  z-index: 2000;
+}
+
+.se-card {
+  width: 371px;
+  background-color: #ffffff;
+  border: 2px solid #3186ff;
+  border-radius: 8px;
+  box-shadow: 0 0 24.6px 11px rgba(201, 201, 201, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 44px 56px 40px;
+  text-align: center;
+}
+
+.se-clock {
+  width: 149px;
+  height: 149px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.se-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #000000;
+  margin: 0 0 12px;
+  line-height: 1;
+}
+
+.se-desc {
+  font-size: 14px;
+  font-weight: 400;
+  color: #000000;
+  margin: 0 0 28px;
+  line-height: 1.4;
+}
+
+.se-btn {
+  width: 259px;
+  height: 45px;
+  background-color: #000000;
+  border: none;
+  border-radius: 100px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease;
+}
+
+.se-btn:hover {
+  background-color: #333333;
+}

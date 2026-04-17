@@ -1,0 +1,75 @@
+/* Filter Panel */
+.fp-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 280px;
+  max-height: 520px;
+  overflow-y: auto;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0px 4px 24px 0px rgba(29, 29, 31, 0.12);
+  padding: 0 20px;
+  z-index: 30;
+}
+
+/* Group */
+.fp-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.fp-group-header {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1d1d1f;
+  padding: 20px 0;
+  height: 37px;
+  display: flex;
+  align-items: center;
+  box-sizing: content-box;
+}
+
+/* Checkbox item */
+.fp-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  cursor: pointer;
+  height: 48px;
+}
+
+.fp-item:hover {
+  opacity: 0.8;
+}
+
+.fp-checkbox-hidden {
+  display: none;
+}
+
+.fp-checkbox {
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid #9fa8b8;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background-color: #ffffff;
+  transition: all 0.15s ease;
+}
+
+.fp-checkbox.checked {
+  background-color: #2189FF;
+  border-color: #2189FF;
+}
+
+.fp-label {
+  font-size: 14px;
+  font-weight: 400;
+  color: #1d1d1f;
+  line-height: 23.9px;
+  white-space: nowrap;
+}

@@ -1,0 +1,264 @@
+.ra-page {
+  min-height: 100vh;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ───── Top bar ───── */
+.ra-topbar {
+  width: 100%;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  flex-shrink: 0;
+}
+
+.ra-logo {
+  font-size: 16px;
+  font-weight: 700;
+  color: #000000;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+/* ───── Main ───── */
+.ra-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.ra-form-wrapper {
+  width: 100%;
+  max-width: 422px;
+}
+
+/* ───── Heading ───── */
+.ra-heading {
+  margin-bottom: 32px;
+}
+
+.ra-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #3a3a49;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* ───── Fields ───── */
+.ra-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+/* ───── Floating label input ───── */
+.ra-input-group {
+  position: relative;
+}
+
+.ra-input {
+  width: 100%;
+  height: 48px;
+  border: 1px solid #dddddd;
+  border-radius: 4px;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 400;
+  color: #515151;
+  outline: none;
+  background-color: #ffffff;
+  transition: border-color 0.15s ease;
+  line-height: 24px;
+}
+
+.ra-input:focus {
+  border-color: #2189ff;
+}
+
+/* ───── Industry dropdown ───── */
+.ra-dropdown-wrapper {
+  position: relative;
+}
+
+.ra-industry-box {
+  width: 100%;
+  height: 48px;
+  border: 1px solid #dddddd;
+  border-radius: 4px;
+  padding: 12px;
+  background-color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.ra-industry-box-open {
+  border-color: #2189ff;
+}
+
+.ra-industry-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.ra-industry-placeholder {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 400;
+  color: #000000;
+  line-height: 24px;
+}
+
+.ra-dropdown-chevron {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.ra-chevron-up {
+  transform: rotate(180deg);
+}
+
+.ra-dropdown-panel {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  background-color: #ffffff;
+  border: 1px solid #dddddd;
+  border-radius: 4px;
+  box-shadow: 0 8px 24px rgba(29, 29, 31, 0.08);
+  padding: 4px 0;
+  z-index: 100;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.ra-dropdown-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  text-align: left;
+}
+
+.ra-dropdown-item:hover {
+  background-color: #f7f9fc;
+}
+
+.ra-dropdown-label {
+  font-size: 14px;
+  font-weight: 400;
+  color: #515151;
+  line-height: 24px;
+}
+
+/* ───── Submit button ───── */
+.ra-submit-btn {
+  width: 100%;
+  height: 50px;
+  background-color: #2189ff;
+  border: none;
+  border-radius: 100px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  transition: background-color 0.15s ease;
+}
+
+.ra-submit-btn:hover {
+  background-color: #1a7ae8;
+}
+
+/* ───── Login link ───── */
+.ra-login-link-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #3a3a49;
+  text-align: center;
+  margin: 0;
+  line-height: 24px;
+}
+
+.ra-login-link {
+  color: #006ff2;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.ra-login-link:hover {
+  color: #0056c4;
+}
+
+/* ───── Popup overlay ───── */
+.ra-popup-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(29, 29, 31, 0.2);
+  backdrop-filter: blur(20px);
+  z-index: 2000;
+}
+
+.ra-popup-card {
+  width: 371px;
+  background-color: #ffffff;
+  border: 2px solid #3186ff;
+  border-radius: 8px;
+  box-shadow: 0 0 24.6px 11px rgba(201, 201, 201, 0.3);
+  padding: 44px 56px 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.ra-popup-icon {
+  width: 149px;
+  height: 149px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  margin-bottom: 20px;
+}
+
+.ra-popup-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #000000;
+  margin: 0 0 12px;
+  line-height: 1;
+}
+
+.ra-popup-desc {
+  font-size: 14px;
+  font-weight: 400;
+  color: #000000;
+  margin: 0;
+  line-height: 1.4;
+  width: 259px;
+}
+
+.ra-popup-desc strong {
+  font-weight: 700;
+}

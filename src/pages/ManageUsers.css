@@ -1,0 +1,275 @@
+.mu-page {
+  min-height: 100vh;
+  background-color: #ffffff;
+  position: relative;
+}
+
+/* ───── Sidebar toggle ───── */
+.mu-sidebar-toggle-area {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 72px;
+  padding: 8px 6px 24px;
+  z-index: 10;
+  opacity: 0.8;
+}
+
+.mu-sidebar-toggle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 48px;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.mu-sidebar-toggle:hover {
+  background-color: #f4f5f7;
+}
+
+/* ───── Content ───── */
+.mu-content {
+  max-width: 1248px;
+  margin: 0 auto;
+  padding: 67px 64px 64px;
+}
+
+/* ───── Back button ───── */
+.mu-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1d1d1f;
+  margin-bottom: 8px;
+}
+
+.mu-back-btn:hover {
+  text-decoration: underline;
+}
+
+/* ───── Header ───── */
+.mu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.mu-title {
+  font-size: 38px;
+  font-weight: 700;
+  color: #1d1d1f;
+  margin: 0;
+  line-height: 1;
+}
+
+.mu-search-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 25px;
+  border: 1px solid #e8e9ee;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background-color 0.15s ease;
+}
+
+.mu-search-btn:hover {
+  background-color: #f4f5f7;
+}
+
+/* ───── Search bar ───── */
+.mu-search-bar {
+  margin-bottom: 16px;
+}
+
+.mu-search-input {
+  width: 100%;
+  height: 44px;
+  border: 1px solid #e8e9ee;
+  border-radius: 8px;
+  padding: 0 16px;
+  font-size: 14px;
+  color: #1d1d1f;
+  outline: none;
+}
+
+.mu-search-input:focus {
+  border-color: #1d1d1f;
+}
+
+/* ───── Divider ───── */
+.mu-divider {
+  height: 1px;
+  background-color: #e8e9ee;
+  margin-bottom: 48px;
+}
+
+/* ───── Table ───── */
+.mu-table {
+  width: 100%;
+}
+
+.mu-table-header {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+}
+
+.mu-th {
+  font-size: 12px;
+  font-weight: 700;
+  color: #9fa8b8;
+  line-height: 1;
+}
+
+.mu-table-row {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  border-top: 1px solid #e8e9ee;
+  transition: background-color 0.1s ease;
+}
+
+.mu-table-row:hover {
+  background-color: #fafafa;
+}
+
+/* ───── Column widths ───── */
+.mu-col-name {
+  width: 267px;
+  flex-shrink: 0;
+}
+
+.mu-col-email {
+  width: 283px;
+  flex-shrink: 0;
+}
+
+.mu-col-type {
+  width: 115px;
+  flex-shrink: 0;
+}
+
+.mu-col-industry {
+  flex: 1;
+  min-width: 0;
+}
+
+.mu-col-status {
+  width: 100px;
+  flex-shrink: 0;
+}
+
+.mu-col-actions {
+  width: 40px;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+}
+
+/* ───── Cells ───── */
+.mu-cell {
+  display: flex;
+  align-items: center;
+}
+
+.mu-cell-text {
+  font-size: 12px;
+  font-weight: 400;
+  color: #1d1d1f;
+  line-height: 1.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mu-col-name.mu-cell {
+  gap: 16px;
+}
+
+.mu-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+  border: 1px solid #d5d8de;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mu-avatar span {
+  font-size: 12px;
+  font-weight: 700;
+  color: #5a5d6e;
+  line-height: 1;
+  text-align: center;
+}
+
+.mu-user-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1d1d1f;
+  line-height: 1;
+}
+
+/* ───── Status badges ───── */
+.mu-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+  padding: 0 12px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.mu-status-active {
+  background-color: rgba(52, 199, 89, 0.15);
+  color: #2d8a4e;
+}
+
+.mu-status-pending {
+  background-color: rgba(255, 179, 0, 0.15);
+  color: #c98600;
+}
+
+.mu-status-inactive {
+  background-color: rgba(142, 142, 147, 0.15);
+  color: #636366;
+}
+
+/* ───── More button ───── */
+.mu-more-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 0;
+}
+
+.mu-more-btn:hover {
+  background-color: #f4f5f7;
+}

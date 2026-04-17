@@ -1,0 +1,304 @@
+.ud-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+}
+
+.ud-drawer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 960px;
+  height: 100%;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  animation: udSlideIn 0.3s ease;
+  overflow: hidden;
+}
+
+@keyframes udSlideIn {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+/* ───── Header ───── */
+.ud-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  padding: 0 40px;
+  border-bottom: 1px solid #e8e9ee;
+  flex-shrink: 0;
+}
+
+.ud-header-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1d1d1f;
+}
+
+.ud-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 0;
+}
+
+.ud-close-btn:hover {
+  background-color: #f4f5f7;
+}
+
+/* ───── Body ───── */
+.ud-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 40px 76px;
+}
+
+/* ───── Info bar ───── */
+.ud-info-bar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 48px;
+}
+
+.ud-info-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ud-info-msg {
+  font-size: 14px;
+  font-weight: 400;
+  color: #000000;
+  margin: 0;
+  line-height: 1.7;
+}
+
+.ud-info-msg strong {
+  font-weight: 700;
+}
+
+.ud-info-email {
+  font-size: 12px;
+  font-weight: 400;
+  color: #8f8f8f;
+  line-height: 1.33;
+}
+
+.ud-info-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.ud-deny-btn {
+  height: 50px;
+  padding: 0 20px;
+  background: none;
+  border: none;
+  border-radius: 100px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  color: #000000;
+}
+
+.ud-deny-btn:hover {
+  background-color: #f4f5f7;
+}
+
+.ud-approve-btn {
+  height: 50px;
+  padding: 0 20px;
+  background-color: #1d1d1f;
+  border: none;
+  border-radius: 100px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  transition: background-color 0.15s ease;
+}
+
+.ud-approve-btn:hover {
+  background-color: #333333;
+}
+
+/* ───── Form ───── */
+.ud-form {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.ud-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ud-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1c1c1c;
+  line-height: 1;
+}
+
+.ud-input {
+  height: 50px;
+  border: 1px solid #dddddd;
+  border-radius: 25px;
+  padding: 0 20px;
+  font-size: 18px;
+  font-weight: 400;
+  color: #000000;
+  outline: none;
+  background-color: #ffffff;
+  transition: border-color 0.15s ease;
+}
+
+.ud-input:focus {
+  border-color: #1d1d1f;
+}
+
+/* ───── Select ───── */
+.ud-select-wrapper {
+  position: relative;
+}
+
+.ud-select {
+  width: 100%;
+  height: 50px;
+  border: 1px solid #dddddd;
+  border-radius: 25px;
+  padding: 0 40px 0 20px;
+  font-size: 18px;
+  font-weight: 400;
+  color: #000000;
+  outline: none;
+  background-color: #ffffff;
+  appearance: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.ud-select:focus {
+  border-color: #1d1d1f;
+}
+
+.ud-select-chevron {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+/* ───── Toast ───── */
+.ud-toast {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 620px;
+  background-color: #000000;
+  border-radius: 20px;
+  padding: 20px 24px;
+  animation: udToastIn 0.3s ease;
+}
+
+@keyframes udToastIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(-12px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.ud-toast-msg {
+  font-size: 18px;
+  font-weight: 400;
+  color: #ffffff;
+  line-height: 1.33;
+}
+
+.ud-toast-dismiss {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  padding: 0;
+  margin-left: 24px;
+  flex-shrink: 0;
+}
+
+.ud-toast-dismiss:hover {
+  opacity: 0.8;
+}
+
+/* ───── Disabled state (text inputs only) ───── */
+.ud-input-disabled,
+.ud-input-disabled:focus {
+  background-color: #f0f0f0;
+  border-color: #e8e9ee;
+  color: #8f8f8f;
+  cursor: default;
+}
+
+/* ───── Footer / Save button ───── */
+.ud-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 16px 40px 24px;
+  flex-shrink: 0;
+}
+
+.ud-save-btn {
+  height: 50px;
+  padding: 0 24px;
+  background-color: #1d1d1f;
+  border: none;
+  border-radius: 100px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  transition: background-color 0.15s ease;
+}
+
+.ud-save-btn:hover {
+  background-color: #333333;
+}
+
+.ud-saved-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 50px;
+  padding: 0 24px;
+  background-color: #34c759;
+  border: none;
+  border-radius: 100px;
+  cursor: default;
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+}
