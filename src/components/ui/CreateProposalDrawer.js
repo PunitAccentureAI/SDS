@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import './CreateProposalDrawer.css';
 import DatePicker from './DatePicker';
 import { uploadFile } from '../../services/fileService';
+import { getStoredUser } from '../../services/authService';
 import {
   createProposal,
   validateProposalName,
@@ -398,6 +399,11 @@ export default function CreateProposalDrawer({ show, onClose }) {
     payload?.data?.proposalSessionId ||
     null;
 
+  const getUserId = () => {
+    const user = getStoredUser();
+    return String(user?.user_id ?? user?.id ?? user?._id ?? '0');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const isFormValid = validateRequiredFields();
@@ -416,16 +422,18 @@ export default function CreateProposalDrawer({ show, onClose }) {
       ? `${String(formData.submissionDate.getDate()).padStart(2, '0')}/${String(formData.submissionDate.getMonth() + 1).padStart(2, '0')}/${formData.submissionDate.getFullYear()}`
       : '';
 
+    const userId = getUserId();
+
     const createPayload = {
-      proposalName: formData.proposalName,
-      opportunityId: formData.opportunityId,
-      clientName: formData.clientName,
-      fileType: formData.fileType,
+      user_id: userId,
+      name: formData.proposalName,
+      client_name: formData.clientName,
+      opportunity_id: formData.opportunityId,
       industry: formData.industry,
-      serviceSegment: formData.serviceSegment,
-      internalExternal: formData.internalExternal,
-      projectGoal: formData.projectGoal,
-      submissionDate: dateStr,
+      service_segment: formData.serviceSegment,
+      internal_external: formData.internalExternal,
+      description: formData.projectGoal,
+      submission_date: dateStr,
     };
 
     try {
@@ -437,12 +445,26 @@ export default function CreateProposalDrawer({ show, onClose }) {
 
       const fileForUpload = uploadedFile?.raw || null;
       if (fileForUpload) {
-        uploadFile(fileForUpload, { sessionId }).catch(() => {});
+        uploadFile(fileForUpload, {
+          user_id: userId,
+          client_name: formData.clientName,
+          file_type: formData.fileType,
+          file_tyope: formData.fileType,
+          session_id: sessionId,
+        }).catch(() => {});
       }
 
       navigate(`/proposal/new/${encodeURIComponent(sessionId)}`, {
         state: {
-          ...createPayload,
+          proposalName: formData.proposalName,
+          opportunityId: formData.opportunityId,
+          clientName: formData.clientName,
+          fileType: formData.fileType,
+          industry: formData.industry,
+          serviceSegment: formData.serviceSegment,
+          internalExternal: formData.internalExternal,
+          projectGoal: formData.projectGoal,
+          submissionDate: dateStr,
           sessionId,
           fileName: uploadedFile?.name || null,
           fileId: null,
