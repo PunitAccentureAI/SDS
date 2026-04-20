@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import SideNav from '../components/layout/SideNav';
-import LanguageSwitcher from '../components/ui/LanguageSwitcher';
+import PageTopControls from '../components/layout/PageTopControls';
 import './Settings.css';
 
 export default function Settings() {
@@ -26,23 +26,11 @@ export default function Settings() {
       )}
 
       <div className="settings-page">
-        <div className="settings-sidebar-toggle-area">
-          {!sidenavOpen && (
-            <button
-              className="settings-sidebar-toggle"
-              aria-label="Toggle sidebar"
-              onClick={() => setSidenavOpen(true)}
-            >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <rect x="1" y="1" width="18" height="18" rx="3" stroke="#09121F" strokeWidth="1.5" fill="none" />
-                <line x1="7" y1="1" x2="7" y2="19" stroke="#09121F" strokeWidth="1.5" />
-              </svg>
-            </button>
-          )}
-        </div>
-        <div className="settings-header-right">
-          <LanguageSwitcher />
-        </div>
+        <PageTopControls
+          showLeftButton={!sidenavOpen}
+          onLeftButtonClick={() => setSidenavOpen(true)}
+          leftButtonAriaLabel="Toggle sidebar"
+        />
 
         <div className="settings-content">
           <div className="settings-header">

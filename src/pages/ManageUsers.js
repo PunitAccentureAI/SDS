@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import UserDetailDrawer from '../components/ui/UserDetailDrawer';
-import LanguageSwitcher from '../components/ui/LanguageSwitcher';
+import PageTopControls from '../components/layout/PageTopControls';
 import './ManageUsers.css';
 
 const users = [
@@ -37,21 +37,11 @@ export default function ManageUsers() {
 
   return (
     <div className="mu-page">
-      <div className="mu-sidebar-toggle-area">
-        <button
-          className="mu-sidebar-toggle"
-          aria-label="Toggle sidebar"
-          onClick={() => navigate('/settings')}
-        >
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <rect x="1" y="1" width="18" height="18" rx="3" stroke="#09121F" strokeWidth="1.5" fill="none" />
-            <line x1="7" y1="1" x2="7" y2="19" stroke="#09121F" strokeWidth="1.5" />
-          </svg>
-        </button>
-      </div>
-      <div className="mu-header-right">
-        <LanguageSwitcher />
-      </div>
+      <PageTopControls
+        showLeftButton
+        onLeftButtonClick={() => navigate('/settings')}
+        leftButtonAriaLabel="Back to settings"
+      />
 
       <div className="mu-content">
         <button type="button" className="mu-back-btn" onClick={() => navigate('/settings')}>
