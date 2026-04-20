@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useUploadFileMutation } from '../hooks/useFiles';
 import InternalEnterpriseSearch from './InternalEnterpriseSearch';
@@ -145,12 +145,16 @@ export default function ProposalCreation() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+  const { sessionId: sessionIdFromPath } = useParams();
+  const [searchParams] = useSearchParams();
   const formData = location.state || {};
   const chatEndRef = useRef(null);
   const chatFileInputRef = useRef(null);
   const chatSocketRef = useRef(null);
   const isSocketConnectedRef = useRef(false);
 
+  const sessionIdFromUrl = searchParams.get('sessionId') || '';
+  const sessionId = formData.sessionId || sessionIdFromPath || sessionIdFromUrl;
   const proposalName = formData.proposalName || 'Untitled Proposal';
   const clientName = formData.clientName || '';
   const fileName = formData.fileName || null;
@@ -189,7 +193,7 @@ export default function ProposalCreation() {
   }, [messages, showYesNo, aiTyping]);
 
   useEffect(() => {
-    const socket = createProposalChatSocket({ proposalName, clientName });
+    const socket = createProposalChatSocket({ proposalName, clientName, sessionId });
     chatSocketRef.current = socket;
 
     const handleConnect = () => {
@@ -199,6 +203,7 @@ export default function ProposalCreation() {
       socket.emit(PROPOSAL_CHAT_SOCKET_EVENTS.JOIN_ROOM, {
         proposalName,
         clientName,
+        sessionId,
       });
     };
 
@@ -235,7 +240,7 @@ export default function ProposalCreation() {
     socket.on(PROPOSAL_CHAT_SOCKET_EVENTS.AI_MESSAGE, handleAiMessage);
 
     return () => {
-      socket.emit(PROPOSAL_CHAT_SOCKET_EVENTS.LEAVE_ROOM, { proposalName, clientName });
+      socket.emit(PROPOSAL_CHAT_SOCKET_EVENTS.LEAVE_ROOM, { proposalName, clientName, sessionId });
       socket.off(PROPOSAL_CHAT_SOCKET_EVENTS.CONNECT, handleConnect);
       socket.off(PROPOSAL_CHAT_SOCKET_EVENTS.DISCONNECT, handleDisconnect);
       socket.off(PROPOSAL_CHAT_SOCKET_EVENTS.CONNECT_ERROR, handleConnectError);
@@ -246,7 +251,7 @@ export default function ProposalCreation() {
       isSocketConnectedRef.current = false;
       setIsSocketConnected(false);
     };
-  }, [proposalName, clientName]);
+  }, [proposalName, clientName, sessionId]);
 
   useEffect(() => {
     if (activeTab !== 'documents') {
@@ -342,6 +347,7 @@ export default function ProposalCreation() {
       flowState,
       proposalName,
       clientName,
+      sessionId,
       ...meta,
     });
     return true;
@@ -559,6 +565,13 @@ export default function ProposalCreation() {
   const detailLines = [];
   if (formData.proposalName) detailLines.push({ key: t('createProposal.proposalName'), val: formData.proposalName });
   if (formData.opportunityId) detailLines.push({ key: t('createProposal.opportunityId'), val: formData.opportunityId });
+  if (formData.clientName) detailLines.push({ key: t('createProposal.clientName'), val: formData.clientName });
+  if (formData.fileType) {
+    detailLines.push({
+      key: t('createProposal.fileType'),
+      val: t(`createProposal.fileTypeOptions.${formData.fileType}`),
+    });
+  }
   if (formData.industry) detailLines.push({ key: t('createProposal.industry'), val: formData.industry });
   if (formData.serviceSegment?.length) detailLines.push({ key: t('createProposal.service'), val: formData.serviceSegment.join(', ') });
   if (formData.internalExternal) detailLines.push({ key: t('createProposal.internalExternal'), val: formData.internalExternal });

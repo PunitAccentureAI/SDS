@@ -112,6 +112,14 @@
     "opportunityId": "기회 ID",
     "opportunityIdPlaceholder": "기회 ID를 입력하세요",
     "clientName": "고객 이름",
+    "clientNamePlaceholder": "고객 이름을 입력하세요",
+    "fileType": "파일 유형",
+    "fileTypePlaceholder": "파일 유형을 선택하세요",
+    "fileTypeOptions": {
+      "rfp": "제안요청서(RFP)",
+      "requirementAnalysis": "요구사항 분석",
+      "competitiveAnalysis": "경쟁사 분석"
+    },
     "industry": "산업",
     "industryPlaceholder": "산업을 선택하세요",
     "service": "서비스 부문",

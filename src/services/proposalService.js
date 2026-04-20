@@ -59,3 +59,8 @@ export const getSegmentOptions = async () => {
     return [];
   }
 };
+
+export const createProposal = async (payload = {}) => {
+  const response = await apiClient.post('/create-proposal', payload);
+  return response?.data ?? {};
+};

@@ -15,6 +15,15 @@
   opacity: 0.8;
 }
 
+.mu-header-right {
+  position: fixed;
+  top: 14px;
+  right: 24px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+}
+
 .mu-sidebar-toggle {
   display: flex;
   flex-direction: column;

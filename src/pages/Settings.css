@@ -21,6 +21,15 @@
   opacity: 0.8;
 }
 
+.settings-header-right {
+  position: fixed;
+  top: 14px;
+  right: 24px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+}
+
 .settings-sidebar-toggle {
   display: flex;
   flex-direction: column;

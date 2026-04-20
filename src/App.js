@@ -35,6 +35,7 @@ export default function App() {
         <Route path="/internal-enterprise-search" element={<RequireAuth><InternalEnterpriseSearch /></RequireAuth>} />
         <Route path="/internal-enterprise-search/:id" element={<RequireAuth><InternalEnterpriseSearch /></RequireAuth>} />
         <Route path="/proposal/new" element={<RequireAuth><ProposalCreation /></RequireAuth>} />
+        <Route path="/proposal/new/:sessionId" element={<RequireAuth><ProposalCreation /></RequireAuth>} />
         <Route path="/proposal/:id" element={<RequireAuth><ProposalBuilder /></RequireAuth>} />
         <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
         <Route path="/settings" element={<RequireAuth><Settings /></RequireAuth>} />

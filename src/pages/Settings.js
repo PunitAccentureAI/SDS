@@ -39,6 +39,8 @@ export default function Settings() {
               </svg>
             </button>
           )}
+        </div>
+        <div className="settings-header-right">
           <LanguageSwitcher />
         </div>
 

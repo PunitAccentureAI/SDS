@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import './CreateProposalDrawer.css';
 import DatePicker from './DatePicker';
-import { useUploadFileMutation } from '../../hooks/useFiles';
+import { uploadFile } from '../../services/fileService';
 import {
+  createProposal,
   validateProposalName,
   getIndustryOptions,
   getSegmentOptions,
@@ -22,6 +23,9 @@ const typeOptions = ['Internal', 'External'];
 function CustomSelect({ label, options, value, onChange, placeholder, error, errorMessage }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
+  const getOptionKey = (option) => (typeof option === 'string' ? option : option?.key);
+  const getOptionLabel = (option) => (typeof option === 'string' ? option : option?.label ?? option?.key);
+  const selectedOptionLabel = options.find((option) => getOptionKey(option) === value);
 
   useEffect(() => {
     function close(e) {
@@ -41,7 +45,7 @@ function CustomSelect({ label, options, value, onChange, placeholder, error, err
           onClick={() => setOpen(!open)}
         >
           <span className={value ? 'cpd-select-value' : 'cpd-select-placeholder'}>
-            {value || placeholder}
+            {selectedOptionLabel ? getOptionLabel(selectedOptionLabel) : placeholder}
           </span>
           <svg
             width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -52,17 +56,22 @@ function CustomSelect({ label, options, value, onChange, placeholder, error, err
         </button>
         {open && (
           <div className="cpd-custom-dropdown">
-            {options.map((opt, i) => (
+            {options.map((opt, i) => {
+              const optionKey = getOptionKey(opt);
+              const optionLabel = getOptionLabel(opt);
+
+              return (
               <button
-                key={opt}
+                key={optionKey}
                 type="button"
-                className={`cpd-custom-dropdown-item ${value === opt ? 'selected' : ''}`}
-                onClick={() => { onChange(opt); setOpen(false); }}
+                className={`cpd-custom-dropdown-item ${value === optionKey ? 'selected' : ''}`}
+                onClick={() => { onChange(optionKey); setOpen(false); }}
               >
                 {i > 0 && <div className="cpd-dropdown-divider" />}
-                <span>{opt}</span>
+                <span>{optionLabel}</span>
               </button>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
@@ -194,10 +203,16 @@ function FileChip({ name, size, onRemove }) {
 export default function CreateProposalDrawer({ show, onClose }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const uploadFileMutation = useUploadFileMutation();
+  const fileTypeOptions = [
+    { key: 'rfp', label: t('createProposal.fileTypeOptions.rfp') },
+    { key: 'requirementAnalysis', label: t('createProposal.fileTypeOptions.requirementAnalysis') },
+    { key: 'competitiveAnalysis', label: t('createProposal.fileTypeOptions.competitiveAnalysis') },
+  ];
   const [formData, setFormData] = useState({
     proposalName: '',
     opportunityId: '',
+    clientName: '',
+    fileType: '',
     industry: '',
     serviceSegment: [],
     internalExternal: '',
@@ -206,14 +221,15 @@ export default function CreateProposalDrawer({ show, onClose }) {
   });
   const [uploadedFile, setUploadedFile] = useState(null);
   const [uploadError, setUploadError] = useState('');
+  const [createProposalError, setCreateProposalError] = useState('');
   const [proposalNameError, setProposalNameError] = useState('');
   const [proposalNameChecking, setProposalNameChecking] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formErrors, setFormErrors] = useState({});
   const [industryOptions, setIndustryOptions] = useState(fallbackIndustryOptions);
   const [segmentOptions, setSegmentOptions] = useState(fallbackSegmentOptions);
   const fileInputRef = useRef(null);
   const [dragOver, setDragOver] = useState(false);
-  const uploading = uploadFileMutation.isPending;
   const requiredFieldMessage = t('createProposal.requiredField');
 
   useEffect(() => {
@@ -269,33 +285,26 @@ export default function CreateProposalDrawer({ show, onClose }) {
     setFormData({ ...formData, [field]: val });
   };
 
-  const normalizeUploadedFile = (response, file) => {
+  const normalizeUploadedFile = (file) => {
     setUploadedFile(null);
 
-    const filePayload = response?.data ?? response ?? {};
     const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
 
     return {
-      id: filePayload.id ?? filePayload.fileId ?? filePayload._id ?? null,
-      name: filePayload.name ?? filePayload.fileName ?? file.name,
+      id: `selected-${Date.now()}`,
+      name: file.name,
       size: `${sizeMB} MB`,
-      raw: filePayload,
+      raw: file,
     };
   };
 
-  const processFile = async (file) => {
+  const processFile = (file) => {
     if (!file) return;
 
+    setCreateProposalError('');
     setUploadError('');
-    setUploadedFile(null);
     clearFieldError('file');
-
-    try {
-      const response = await uploadFileMutation.mutateAsync({ file, isTest: true });
-      setUploadedFile(normalizeUploadedFile(response, file));
-    } catch (error) {
-      setUploadError(error?.message || 'File upload failed');
-    }
+    setUploadedFile(normalizeUploadedFile(file));
   };
 
   const handleFileDrop = (e) => {
@@ -303,10 +312,7 @@ export default function CreateProposalDrawer({ show, onClose }) {
     setDragOver(false);
     const { files } = e.dataTransfer;
     if (!files?.length) return;
-    if (files.length > 1) {
-      setUploadError(t('createProposal.singleFileOnly'));
-      return;
-    }
+    if (files.length > 1) return setUploadError(t('createProposal.singleFileOnly'));
     processFile(files[0]);
   };
 
@@ -330,6 +336,8 @@ export default function CreateProposalDrawer({ show, onClose }) {
     if (!uploadedFile) nextErrors.file = requiredFieldMessage;
     if (!formData.proposalName.trim()) nextErrors.proposalName = requiredFieldMessage;
     if (!formData.opportunityId.trim()) nextErrors.opportunityId = requiredFieldMessage;
+    if (!formData.clientName.trim()) nextErrors.clientName = requiredFieldMessage;
+    if (!formData.fileType) nextErrors.fileType = requiredFieldMessage;
     if (!formData.industry) nextErrors.industry = requiredFieldMessage;
     if (!formData.serviceSegment.length) nextErrors.serviceSegment = requiredFieldMessage;
     if (!formData.internalExternal) nextErrors.internalExternal = requiredFieldMessage;
@@ -381,7 +389,16 @@ export default function CreateProposalDrawer({ show, onClose }) {
     }
   };
 
-  const handleSubmit = (e) => {
+  const parseSessionId = (payload) =>
+    payload?.sessionId ||
+    payload?.data?.sessionId ||
+    payload?.id ||
+    payload?.data?.id ||
+    payload?.proposalSessionId ||
+    payload?.data?.proposalSessionId ||
+    null;
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const isFormValid = validateRequiredFields();
 
@@ -392,25 +409,52 @@ export default function CreateProposalDrawer({ show, onClose }) {
     if (proposalNameError || proposalNameChecking) {
       return;
     }
+    setCreateProposalError('');
+    setIsSubmitting(true);
+
     const dateStr = formData.submissionDate
       ? `${String(formData.submissionDate.getDate()).padStart(2, '0')}/${String(formData.submissionDate.getMonth() + 1).padStart(2, '0')}/${formData.submissionDate.getFullYear()}`
       : '';
-    navigate('/proposal/new', {
-      state: {
-        proposalName: formData.proposalName,
-        opportunityId: formData.opportunityId,
-        industry: formData.industry,
-        serviceSegment: formData.serviceSegment,
-        internalExternal: formData.internalExternal,
-        projectGoal: formData.projectGoal,
-        submissionDate: dateStr,
-        clientName: formData.proposalName?.split(' ')[0] || '',
-        fileId: uploadedFile?.id || null,
-        fileName: uploadedFile?.name || null,
-        uploadedFile: uploadedFile?.raw || null,
-      },
-    });
-    onClose();
+
+    const createPayload = {
+      proposalName: formData.proposalName,
+      opportunityId: formData.opportunityId,
+      clientName: formData.clientName,
+      fileType: formData.fileType,
+      industry: formData.industry,
+      serviceSegment: formData.serviceSegment,
+      internalExternal: formData.internalExternal,
+      projectGoal: formData.projectGoal,
+      submissionDate: dateStr,
+    };
+
+    try {
+      const createResponse = await createProposal(createPayload);
+      const sessionId = parseSessionId(createResponse);
+      if (!sessionId) {
+        throw new Error('Session ID was not returned from create-proposal.');
+      }
+
+      const fileForUpload = uploadedFile?.raw || null;
+      if (fileForUpload) {
+        uploadFile(fileForUpload, { sessionId }).catch(() => {});
+      }
+
+      navigate(`/proposal/new/${encodeURIComponent(sessionId)}`, {
+        state: {
+          ...createPayload,
+          sessionId,
+          fileName: uploadedFile?.name || null,
+          fileId: null,
+          uploadedFile: null,
+        },
+      });
+      onClose();
+    } catch (error) {
+      setCreateProposalError(error?.message || 'Failed to create proposal.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!show) return null;
@@ -436,38 +480,31 @@ export default function CreateProposalDrawer({ show, onClose }) {
 
             {/* Upload area */}
             <div
-              className={`cpd-upload-area ${dragOver ? 'drag-over' : ''} ${uploading ? 'uploading' : ''}${formErrors.file ? ' cpd-upload-area-error' : ''}`}
+              className={`cpd-upload-area ${dragOver ? 'drag-over' : ''}${formErrors.file ? ' cpd-upload-area-error' : ''}`}
               onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
               onDragLeave={() => setDragOver(false)}
               onDrop={handleFileDrop}
             >
-              {uploading ? (
-                <div className="cpd-uploading-state">
-                  <span className="cpd-upload-spinner" />
-                  <span className="cpd-uploading-text">{t('createProposal.uploading')}</span>
+              <>
+                <div className="cpd-upload-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 16V4m0 0l-4 4m4-4l4 4" stroke="#09121F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke="#09121F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
                 </div>
-              ) : (
-                <>
-                  <div className="cpd-upload-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                      <path d="M12 16V4m0 0l-4 4m4-4l4 4" stroke="#09121F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                      <path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke="#09121F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </div>
-                  <p className="cpd-upload-title">{t('createProposal.uploadLabel')}</p>
-                  <p className="cpd-upload-hint">
-                    {t('createProposal.uploadOr')}
-                  </p>
-                  <button
-                    type="button"
-                    className="cpd-browse-btn"
-                    disabled={uploading}
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    {t('createProposal.browseFiles')}
-                  </button>
-                </>
-              )}
+                <p className="cpd-upload-title">{t('createProposal.uploadLabel')}</p>
+                <p className="cpd-upload-hint">
+                  {t('createProposal.uploadOr')}
+                </p>
+                <button
+                  type="button"
+                  className="cpd-browse-btn"
+                  disabled={isSubmitting}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  {t('createProposal.browseFiles')}
+                </button>
+              </>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -486,6 +523,11 @@ export default function CreateProposalDrawer({ show, onClose }) {
             {!uploadError && formErrors.file && (
               <div className="cpd-field-error" role="alert">
                 {formErrors.file}
+              </div>
+            )}
+            {createProposalError && (
+              <div className="cpd-field-error" role="alert">
+                {createProposalError}
               </div>
             )}
 
@@ -532,6 +574,32 @@ export default function CreateProposalDrawer({ show, onClose }) {
                 </div>
               )}
             </div>
+
+            <div className="cpd-field">
+              <label className="cpd-label">{t('createProposal.clientName')}</label>
+              <input
+                type="text"
+                className={`cpd-input${formErrors.clientName ? ' cpd-input-error' : ''}`}
+                placeholder={t('createProposal.clientNamePlaceholder')}
+                value={formData.clientName}
+                onChange={handleChange('clientName')}
+              />
+              {formErrors.clientName && (
+                <div className="cpd-field-error" role="alert">
+                  {formErrors.clientName}
+                </div>
+              )}
+            </div>
+
+            <CustomSelect
+              label={t('createProposal.fileType')}
+              options={fileTypeOptions}
+              value={formData.fileType}
+              onChange={handleSelectChange('fileType')}
+              placeholder={t('createProposal.fileTypePlaceholder')}
+              error={Boolean(formErrors.fileType)}
+              errorMessage={formErrors.fileType}
+            />
 
             <CustomSelect
               label={t('createProposal.industry')}
@@ -601,7 +669,7 @@ export default function CreateProposalDrawer({ show, onClose }) {
             </div>
 
             <div className="cpd-footer">
-              <button type="submit" className="cpd-submit-btn" disabled={uploading || proposalNameChecking}>
+              <button type="submit" className="cpd-submit-btn" disabled={isSubmitting || proposalNameChecking}>
                 {t('createProposal.createBtn')}
               </button>
             </div>

@@ -48,6 +48,8 @@ export default function ManageUsers() {
             <line x1="7" y1="1" x2="7" y2="19" stroke="#09121F" strokeWidth="1.5" />
           </svg>
         </button>
+      </div>
+      <div className="mu-header-right">
         <LanguageSwitcher />
       </div>
 

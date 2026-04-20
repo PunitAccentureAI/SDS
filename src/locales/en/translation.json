@@ -112,6 +112,14 @@
     "opportunityId": "Opportunity ID",
     "opportunityIdPlaceholder": "Type opportunity ID here",
     "clientName": "Client name",
+    "clientNamePlaceholder": "Type client name here",
+    "fileType": "File type",
+    "fileTypePlaceholder": "Choose file type",
+    "fileTypeOptions": {
+      "rfp": "RFP",
+      "requirementAnalysis": "Requirement analysis",
+      "competitiveAnalysis": "Competitive analysis"
+    },
     "industry": "Industry",
     "industryPlaceholder": "Choose industry",
     "service": "Service Segment",

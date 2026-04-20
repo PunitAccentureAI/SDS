@@ -2,7 +2,11 @@ import { io } from 'socket.io-client';
 import { API_BASE_URL } from '../api';
 import { getAccessToken } from './authService';
 
-const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || API_BASE_URL || window.location.origin;
+const SOCKET_URL =
+  import.meta.env.VITE_SOCKET_URL ||
+  import.meta.env.REACT_APP_SOCKET_URL ||
+  API_BASE_URL ||
+  window.location.origin;
 
 export const PROPOSAL_CHAT_SOCKET_EVENTS = {
   CONNECT: 'connect',
@@ -15,7 +19,7 @@ export const PROPOSAL_CHAT_SOCKET_EVENTS = {
   AI_TYPING: 'proposal:new:ai-typing',
 };
 
-export const createProposalChatSocket = ({ proposalName, clientName } = {}) => {
+export const createProposalChatSocket = ({ proposalName, clientName, sessionId } = {}) => {
   const token = getAccessToken();
 
   const socket = io(SOCKET_URL, {
@@ -26,6 +30,7 @@ export const createProposalChatSocket = ({ proposalName, clientName } = {}) => {
       context: 'proposal-new',
       proposalName: proposalName || '',
       clientName: clientName || '',
+      sessionId: sessionId || '',
     },
   });
 
