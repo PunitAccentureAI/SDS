@@ -600,7 +600,6 @@ export default function CreateProposalDrawer({ show, onClose }) {
         user_id: userId,
         client_name: formData.clientName,
         file_type: formData.fileType,
-        file_tyope: formData.fileType,
         session_id: sessionId,
       });
 

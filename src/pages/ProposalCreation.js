@@ -134,11 +134,6 @@ export default function ProposalCreation() {
       isSocketConnectedRef.current = true;
       setIsSocketConnected(true);
       setShowSocketIssuePopup(false);
-      socket.emit(PROPOSAL_CHAT_SOCKET_EVENTS.JOIN_ROOM, {
-        proposalName,
-        clientName,
-        sessionId,
-      });
     };
 
     const handleDisconnect = () => {
@@ -177,7 +172,6 @@ export default function ProposalCreation() {
     socket.on(PROPOSAL_CHAT_SOCKET_EVENTS.AI_MESSAGE, handleAiMessage);
 
     return () => {
-      socket.emit(PROPOSAL_CHAT_SOCKET_EVENTS.LEAVE_ROOM, { proposalName, clientName, sessionId });
       socket.off(PROPOSAL_CHAT_SOCKET_EVENTS.CONNECT, handleConnect);
       socket.off(PROPOSAL_CHAT_SOCKET_EVENTS.DISCONNECT, handleDisconnect);
       socket.off(PROPOSAL_CHAT_SOCKET_EVENTS.CONNECT_ERROR, handleConnectError);

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import SideNav from '../components/layout/SideNav';
 import PageTopControls from '../components/layout/PageTopControls';
+import { logout } from '../services/authService';
 import './Profile.css';
 
 const userValues = {
@@ -27,7 +28,8 @@ export default function Profile() {
   ];
 
   const handleLogout = () => {
-    navigate('/login');
+    logout();
+    navigate('/login', { replace: true });
   };
 
   return (
