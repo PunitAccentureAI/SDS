@@ -280,6 +280,7 @@ export default function ProposalCreation() {
   };
 
   const handleSendMessage = () => {
+    if (aiTyping) return;
     if (!replyText.trim()) return;
     const userMessage = replyText.trim();
     const outgoingMessageType = lastSocketOutputType === 'hil_output' ? 'hil_input' : 'user_input';
@@ -340,10 +341,22 @@ export default function ProposalCreation() {
 
   const attachSupportFile = async (file) => {
     if (!file) return;
+    if (!sessionId) {
+      throw new Error('Session ID is required before uploading a file.');
+    }
 
     const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
     const ext = inferDocType(file.name);
-    const uploadedFile = await uploadFileMutation.mutateAsync({ file, isTest: true });
+    const uploadedFile = await uploadFileMutation.mutateAsync({
+      file,
+      extraFields: {
+        user_id: String(userId),
+        client_name: clientName,
+        file_type: fileType,
+        session_id: sessionId,
+      },
+      isTest: false,
+    });
     const normalizedFile = normalizeUploadedFile(uploadedFile, file);
 
     setSupportFiles([normalizedFile]);
@@ -1079,7 +1092,7 @@ export default function ProposalCreation() {
                       className="pcr-reply-input"
                       placeholder={t('proposalCreation.replyPlaceholder')}
                       value={replyText}
-                      disabled={!isSocketConnected}
+                      disabled={!isSocketConnected || aiTyping}
                       onChange={(e) => setReplyText(e.target.value)}
                       onKeyDown={handleKeyDown}
                     />
@@ -1096,7 +1109,7 @@ export default function ProposalCreation() {
                         type="button"
                         className="pcr-reply-icon-btn"
                         aria-label="Attach"
-                        disabled={isUploadingSupportFile || !isSocketConnected}
+                        disabled={isUploadingSupportFile || !isSocketConnected || aiTyping}
                         onClick={() => chatFileInputRef.current?.click()}
                       >
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -1107,7 +1120,7 @@ export default function ProposalCreation() {
                         type="button"
                         className="pcr-reply-icon-btn"
                         aria-label="Send"
-                        disabled={!isSocketConnected || !replyText.trim()}
+                        disabled={!isSocketConnected || !replyText.trim() || aiTyping}
                         onClick={handleSendMessage}
                       >
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
