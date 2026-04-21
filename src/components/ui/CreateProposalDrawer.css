@@ -64,6 +64,42 @@
   background-color: #f4f5f7;
 }
 
+.cpd-error-popup {
+  margin: 16px 76px 0;
+  border: 1px solid #ef9aa8;
+  background: #fff4f6;
+  border-radius: 12px;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px 10px 16px;
+}
+
+.cpd-error-popup-text {
+  color: #8a1f33;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.cpd-error-popup-close {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cpd-error-popup-close:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
 /* Content */
 .cpd-content {
   flex: 1;

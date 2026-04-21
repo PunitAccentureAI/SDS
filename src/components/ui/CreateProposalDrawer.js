@@ -226,6 +226,7 @@ export default function CreateProposalDrawer({ show, onClose }) {
   const [proposalNameError, setProposalNameError] = useState('');
   const [proposalNameChecking, setProposalNameChecking] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitPhase, setSubmitPhase] = useState('idle');
   const [formErrors, setFormErrors] = useState({});
   const [industryOptions, setIndustryOptions] = useState(fallbackIndustryOptions);
   const [segmentOptions, setSegmentOptions] = useState(fallbackSegmentOptions);
@@ -278,7 +279,10 @@ export default function CreateProposalDrawer({ show, onClose }) {
       setProposalNameError('');
     }
     clearFieldError(field);
-    setFormData({ ...formData, [field]: e.target.value });
+    const nextValue = field === 'opportunityId'
+      ? e.target.value.replace(/\D/g, '')
+      : e.target.value;
+    setFormData({ ...formData, [field]: nextValue });
   };
 
   const handleSelectChange = (field) => (val) => {
@@ -329,6 +333,10 @@ export default function CreateProposalDrawer({ show, onClose }) {
   const handleRemoveFile = () => {
     setUploadedFile(null);
     setUploadError('');
+  };
+
+  const dismissCreateProposalError = () => {
+    setCreateProposalError('');
   };
 
   const validateRequiredFields = () => {
@@ -417,9 +425,10 @@ export default function CreateProposalDrawer({ show, onClose }) {
     }
     setCreateProposalError('');
     setIsSubmitting(true);
+    setSubmitPhase('creating');
 
     const dateStr = formData.submissionDate
-      ? `${String(formData.submissionDate.getDate()).padStart(2, '0')}/${String(formData.submissionDate.getMonth() + 1).padStart(2, '0')}/${formData.submissionDate.getFullYear()}`
+      ? `${String(formData.submissionDate.getMonth() + 1).padStart(2, '0')},${String(formData.submissionDate.getDate()).padStart(2, '0')},${formData.submissionDate.getFullYear()}`
       : '';
 
     const userId = getUserId();
@@ -444,15 +453,24 @@ export default function CreateProposalDrawer({ show, onClose }) {
       }
 
       const fileForUpload = uploadedFile?.raw || null;
-      if (fileForUpload) {
-        uploadFile(fileForUpload, {
-          user_id: userId,
-          client_name: formData.clientName,
-          file_type: formData.fileType,
-          file_tyope: formData.fileType,
-          session_id: sessionId,
-        }).catch(() => {});
+      if (!fileForUpload) {
+        throw new Error('File is required.');
       }
+
+      setSubmitPhase('uploading');
+      const uploadResponse = await uploadFile(fileForUpload, {
+        user_id: userId,
+        client_name: formData.clientName,
+        file_type: formData.fileType,
+        file_tyope: formData.fileType,
+        session_id: sessionId,
+      });
+
+      const fileId =
+        uploadResponse?.fileId ??
+        uploadResponse?.id ??
+        uploadResponse?.data?.fileId ??
+        null;
 
       navigate(`/proposal/new/${encodeURIComponent(sessionId)}`, {
         state: {
@@ -467,7 +485,7 @@ export default function CreateProposalDrawer({ show, onClose }) {
           submissionDate: dateStr,
           sessionId,
           fileName: uploadedFile?.name || null,
-          fileId: null,
+          fileId,
           uploadedFile: null,
         },
       });
@@ -475,6 +493,7 @@ export default function CreateProposalDrawer({ show, onClose }) {
     } catch (error) {
       setCreateProposalError(error?.message || 'Failed to create proposal.');
     } finally {
+      setSubmitPhase('idle');
       setIsSubmitting(false);
     }
   };
@@ -482,8 +501,8 @@ export default function CreateProposalDrawer({ show, onClose }) {
   if (!show) return null;
 
   return (
-    <div className="cpd-overlay" onClick={onClose}>
-      <div className="cpd-drawer" onClick={(e) => e.stopPropagation()}>
+    <div className="cpd-overlay">
+      <div className="cpd-drawer">
         <div className="cpd-topbar">
           <span className="cpd-topbar-title">{t('createProposal.title')}</span>
           <button className="cpd-close-btn" onClick={onClose} aria-label="Close">
@@ -492,6 +511,21 @@ export default function CreateProposalDrawer({ show, onClose }) {
             </svg>
           </button>
         </div>
+        {createProposalError && (
+          <div className="cpd-error-popup" role="alert" aria-live="assertive">
+            <div className="cpd-error-popup-text">{createProposalError}</div>
+            <button
+              type="button"
+              className="cpd-error-popup-close"
+              onClick={dismissCreateProposalError}
+              aria-label="Dismiss error"
+            >
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+                <path d="M5 5l10 10M15 5L5 15" stroke="#8F8F8F" strokeWidth="1.8" strokeLinecap="round" />
+              </svg>
+            </button>
+          </div>
+        )}
 
         <div className="cpd-content">
           <form onSubmit={handleSubmit}>
@@ -547,12 +581,6 @@ export default function CreateProposalDrawer({ show, onClose }) {
                 {formErrors.file}
               </div>
             )}
-            {createProposalError && (
-              <div className="cpd-field-error" role="alert">
-                {createProposalError}
-              </div>
-            )}
-
             {/* File chip */}
             {uploadedFile && (
               <FileChip
@@ -585,6 +613,7 @@ export default function CreateProposalDrawer({ show, onClose }) {
               <label className="cpd-label">{t('createProposal.opportunityId')}</label>
               <input
                 type="text"
+                inputMode="numeric"
                 className={`cpd-input${formErrors.opportunityId ? ' cpd-input-error' : ''}`}
                 placeholder={t('createProposal.opportunityIdPlaceholder')}
                 value={formData.opportunityId}
@@ -677,6 +706,7 @@ export default function CreateProposalDrawer({ show, onClose }) {
               <div className={formErrors.submissionDate ? 'cpd-date-error' : ''}>
                 <DatePicker
                   value={formData.submissionDate}
+                  onlyToday
                   onChange={(date) => {
                     clearFieldError('submissionDate');
                     setFormData({ ...formData, submissionDate: date });
@@ -692,7 +722,11 @@ export default function CreateProposalDrawer({ show, onClose }) {
 
             <div className="cpd-footer">
               <button type="submit" className="cpd-submit-btn" disabled={isSubmitting || proposalNameChecking}>
-                {t('createProposal.createBtn')}
+                {submitPhase === 'uploading'
+                  ? t('createProposal.uploading')
+                  : submitPhase === 'creating'
+                    ? t('createProposal.creatingProposal')
+                    : t('createProposal.createBtn')}
               </button>
             </div>
           </form>

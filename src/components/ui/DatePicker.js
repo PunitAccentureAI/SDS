@@ -23,12 +23,17 @@ function formatDate(date) {
   return `${d}/${m}/${y}`;
 }
 
-export default function DatePicker({ label, value, onChange }) {
+export default function DatePicker({ label, value, onChange, onlyToday = false }) {
   const today = new Date();
+  const todayDay = today.getDate();
+  const todayMonth = today.getMonth();
+  const todayYear = today.getFullYear();
   const [open, setOpen] = useState(false);
-  const [viewYear, setViewYear] = useState(value ? value.getFullYear() : today.getFullYear());
-  const [viewMonth, setViewMonth] = useState(value ? value.getMonth() : today.getMonth());
-  const [selectedDate, setSelectedDate] = useState(value || null);
+  const [viewYear, setViewYear] = useState(value ? value.getFullYear() : todayYear);
+  const [viewMonth, setViewMonth] = useState(value ? value.getMonth() : todayMonth);
+  const [selectedDate, setSelectedDate] = useState(
+    value || (onlyToday ? new Date(todayYear, todayMonth, todayDay) : null),
+  );
   const ref = useRef(null);
 
   useEffect(() => {
@@ -44,10 +49,17 @@ export default function DatePicker({ label, value, onChange }) {
       setSelectedDate(value);
       setViewYear(value.getFullYear());
       setViewMonth(value.getMonth());
+      return;
     }
-  }, [value]);
+    if (onlyToday) {
+      setSelectedDate(new Date(todayYear, todayMonth, todayDay));
+      setViewYear(todayYear);
+      setViewMonth(todayMonth);
+    }
+  }, [onlyToday, todayDay, todayMonth, todayYear, value]);
 
   const prevMonth = () => {
+    if (onlyToday) return;
     if (viewMonth === 0) {
       setViewMonth(11);
       setViewYear(viewYear - 1);
@@ -57,6 +69,7 @@ export default function DatePicker({ label, value, onChange }) {
   };
 
   const nextMonth = () => {
+    if (onlyToday) return;
     if (viewMonth === 11) {
       setViewMonth(0);
       setViewYear(viewYear + 1);
@@ -67,6 +80,7 @@ export default function DatePicker({ label, value, onChange }) {
 
   const handleDayClick = (day, isCurrentMonth) => {
     if (!isCurrentMonth) return;
+    if (onlyToday && (viewYear !== todayYear || viewMonth !== todayMonth || day !== todayDay)) return;
     setSelectedDate(new Date(viewYear, viewMonth, day));
   };
 
@@ -110,6 +124,12 @@ export default function DatePicker({ label, value, onChange }) {
       selectedDate.getMonth() === viewMonth &&
       selectedDate.getFullYear() === viewYear
     );
+  };
+
+  const isDisabled = (day, isCurrentMonth) => {
+    if (!isCurrentMonth) return true;
+    if (!onlyToday) return false;
+    return viewYear !== todayYear || viewMonth !== todayMonth || day !== todayDay;
   };
 
   return (
@@ -158,9 +178,9 @@ export default function DatePicker({ label, value, onChange }) {
                   <button
                     key={ci}
                     type="button"
-                    className={`dp-day-cell${cell.isCurrentMonth ? '' : ' other-month'}${isSelected(cell.day, cell.isCurrentMonth) ? ' selected' : ''}`}
+                    className={`dp-day-cell${cell.isCurrentMonth ? '' : ' other-month'}${isSelected(cell.day, cell.isCurrentMonth) ? ' selected' : ''}${isDisabled(cell.day, cell.isCurrentMonth) ? ' disabled' : ''}`}
                     onClick={() => handleDayClick(cell.day, cell.isCurrentMonth)}
-                    disabled={!cell.isCurrentMonth}
+                    disabled={isDisabled(cell.day, cell.isCurrentMonth)}
                   >
                     {cell.day}
                   </button>

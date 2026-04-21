@@ -44,7 +44,7 @@ export const validateProposalName = async (proposalName) => {
 
 export const getIndustryOptions = async () => {
   try {
-    const response = await apiClient.get('/industry');
+    const response = await apiClient.get('/industries');
     return normalizeOptionList(response?.data);
   } catch (error) {
     return [];
@@ -53,7 +53,7 @@ export const getIndustryOptions = async () => {
 
 export const getSegmentOptions = async () => {
   try {
-    const response = await apiClient.get('/segment');
+    const response = await apiClient.get('/service-segments');
     return normalizeOptionList(response?.data);
   } catch (error) {
     return [];

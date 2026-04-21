@@ -153,6 +153,11 @@
   cursor: default;
 }
 
+.dp-day-cell.disabled {
+  color: #c8cdd8;
+  cursor: not-allowed;
+}
+
 .dp-day-cell.selected {
   background-color: #1d1d1f;
   color: #ffffff;

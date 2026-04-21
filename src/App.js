@@ -13,6 +13,7 @@ import RequestAccess from './pages/RequestAccess';
 import Welcome from './pages/Welcome';
 import ProposalCreation from './pages/ProposalCreation';
 import InternalEnterpriseSearch from './pages/InternalEnterpriseSearch';
+import Testing from './pages/Testing';
 import AuthenticatedLayout from './components/layout/AuthenticatedLayout';
 import PublicLayout from './components/layout/PublicLayout';
 
@@ -38,6 +39,7 @@ export default function App() {
           <Route path="/settings/users" element={<ManageUsers />} />
           <Route path="/session-expired" element={<SessionExpired />} />
           <Route path="/loading" element={<Loader />} />
+          <Route path="/testing" element={<Testing />} />
           <Route path="/" element={<Welcome />} />
         </Route>
       </Routes>
