@@ -1,39 +1,74 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import './CreateProposalDrawer.css';
-import DatePicker from './DatePicker';
-import { uploadFile } from '../../services/fileService';
-import { getStoredUser } from '../../services/authService';
+import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import "./CreateProposalDrawer.css";
+import DatePicker from "./DatePicker";
+import { uploadFile } from "../../services/fileService";
+import { getStoredUser } from "../../services/authService";
 import {
   createProposal,
   validateProposalName,
   getIndustryOptions,
   getSegmentOptions,
-} from '../../services/proposalService';
+} from "../../services/proposalService";
 
-const fallbackIndustryOptions = ['The Public', 'National Defence', 'Finance', 'Manufacturing', 'Service', 'Medical Care', 'Logistics'];
-const fallbackSegmentOptions = [
-  'Cloud Transformation', 'AI Contact Center', 'SaaS Transformation', 'Security',
-  'App ITO', 'Consulting', 'ERP', 'Standard Cloud', 'Gen AI Transformation',
-  'PUM', 'Cloud App ITO', 'Telecom MW', 'CRM', 'Finance Service System',
-  'Portal', 'Dedicated Cloud', 'Data Center', 'EPSS', 'RPA',
+const fallbackIndustryOptions = [
+  "The Public",
+  "National Defence",
+  "Finance",
+  "Manufacturing",
+  "Service",
+  "Medical Care",
+  "Logistics",
 ];
-const typeOptions = ['Internal', 'External'];
+const fallbackSegmentOptions = [
+  "Cloud Transformation",
+  "AI Contact Center",
+  "SaaS Transformation",
+  "Security",
+  "App ITO",
+  "Consulting",
+  "ERP",
+  "Standard Cloud",
+  "Gen AI Transformation",
+  "PUM",
+  "Cloud App ITO",
+  "Telecom MW",
+  "CRM",
+  "Finance Service System",
+  "Portal",
+  "Dedicated Cloud",
+  "Data Center",
+  "EPSS",
+  "RPA",
+];
+const typeOptions = ["Internal", "External"];
 
-function CustomSelect({ label, options, value, onChange, placeholder, error, errorMessage }) {
+function CustomSelect({
+  label,
+  options,
+  value,
+  onChange,
+  placeholder,
+  error,
+  errorMessage,
+}) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
-  const getOptionKey = (option) => (typeof option === 'string' ? option : option?.key);
-  const getOptionLabel = (option) => (typeof option === 'string' ? option : option?.label ?? option?.key);
-  const selectedOptionLabel = options.find((option) => getOptionKey(option) === value);
+  const getOptionKey = (option) =>
+    typeof option === "string" ? option : option?.key;
+  const getOptionLabel = (option) =>
+    typeof option === "string" ? option : (option?.label ?? option?.key);
+  const selectedOptionLabel = options.find(
+    (option) => getOptionKey(option) === value,
+  );
 
   useEffect(() => {
     function close(e) {
       if (ref.current && !ref.current.contains(e.target)) setOpen(false);
     }
-    document.addEventListener('mousedown', close);
-    return () => document.removeEventListener('mousedown', close);
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
   }, []);
 
   return (
@@ -42,17 +77,30 @@ function CustomSelect({ label, options, value, onChange, placeholder, error, err
       <div className="cpd-custom-select-wrapper">
         <button
           type="button"
-          className={`cpd-custom-select-trigger ${open ? 'open' : ''}${error ? ' cpd-input-error' : ''}`}
+          className={`cpd-custom-select-trigger ${open ? "open" : ""}${error ? " cpd-input-error" : ""}`}
           onClick={() => setOpen(!open)}
         >
-          <span className={value ? 'cpd-select-value' : 'cpd-select-placeholder'}>
-            {selectedOptionLabel ? getOptionLabel(selectedOptionLabel) : placeholder}
+          <span
+            className={value ? "cpd-select-value" : "cpd-select-placeholder"}
+          >
+            {selectedOptionLabel
+              ? getOptionLabel(selectedOptionLabel)
+              : placeholder}
           </span>
           <svg
-            width="16" height="16" viewBox="0 0 24 24" fill="none"
-            className={`cpd-select-chevron ${open ? 'flipped' : ''}`}
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            className={`cpd-select-chevron ${open ? "flipped" : ""}`}
           >
-            <path d="M7 10l5 5 5-5" stroke="#1d1d1f" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path
+              d="M7 10l5 5 5-5"
+              stroke="#1d1d1f"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         </button>
         {open && (
@@ -62,15 +110,18 @@ function CustomSelect({ label, options, value, onChange, placeholder, error, err
               const optionLabel = getOptionLabel(opt);
 
               return (
-              <button
-                key={optionKey}
-                type="button"
-                className={`cpd-custom-dropdown-item ${value === optionKey ? 'selected' : ''}`}
-                onClick={() => { onChange(optionKey); setOpen(false); }}
-              >
-                {i > 0 && <div className="cpd-dropdown-divider" />}
-                <span>{optionLabel}</span>
-              </button>
+                <button
+                  key={optionKey}
+                  type="button"
+                  className={`cpd-custom-dropdown-item ${value === optionKey ? "selected" : ""}`}
+                  onClick={() => {
+                    onChange(optionKey);
+                    setOpen(false);
+                  }}
+                >
+                  {i > 0 && <div className="cpd-dropdown-divider" />}
+                  <span>{optionLabel}</span>
+                </button>
               );
             })}
           </div>
@@ -85,7 +136,15 @@ function CustomSelect({ label, options, value, onChange, placeholder, error, err
   );
 }
 
-function MultiSelect({ label, options, selected, onChange, placeholder, error, errorMessage }) {
+function MultiSelect({
+  label,
+  options,
+  selected,
+  onChange,
+  placeholder,
+  error,
+  errorMessage,
+}) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
@@ -93,8 +152,8 @@ function MultiSelect({ label, options, selected, onChange, placeholder, error, e
     function close(e) {
       if (ref.current && !ref.current.contains(e.target)) setOpen(false);
     }
-    document.addEventListener('mousedown', close);
-    return () => document.removeEventListener('mousedown', close);
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
   }, []);
 
   const toggleOption = (opt) => {
@@ -115,7 +174,7 @@ function MultiSelect({ label, options, selected, onChange, placeholder, error, e
       <label className="cpd-label">{label}</label>
       <div className="cpd-custom-select-wrapper">
         <div
-          className={`cpd-multi-trigger ${open ? 'open' : ''} ${selected.length > 0 ? 'has-chips' : ''}${error ? ' cpd-input-error' : ''}`}
+          className={`cpd-multi-trigger ${open ? "open" : ""} ${selected.length > 0 ? "has-chips" : ""}${error ? " cpd-input-error" : ""}`}
           onClick={() => setOpen(!open)}
         >
           {selected.length > 0 ? (
@@ -131,7 +190,12 @@ function MultiSelect({ label, options, selected, onChange, placeholder, error, e
                   >
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                       <circle cx="10" cy="10" r="9" fill="#9FA8B8" />
-                      <path d="M7 7l6 6M13 7l-6 6" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" />
+                      <path
+                        d="M7 7l6 6M13 7l-6 6"
+                        stroke="#fff"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                      />
                     </svg>
                   </button>
                 </span>
@@ -141,10 +205,19 @@ function MultiSelect({ label, options, selected, onChange, placeholder, error, e
             <span className="cpd-select-placeholder">{placeholder}</span>
           )}
           <svg
-            width="16" height="16" viewBox="0 0 24 24" fill="none"
-            className={`cpd-select-chevron ${open ? 'flipped' : ''}`}
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            className={`cpd-select-chevron ${open ? "flipped" : ""}`}
           >
-            <path d="M7 10l5 5 5-5" stroke="#1d1d1f" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path
+              d="M7 10l5 5 5-5"
+              stroke="#1d1d1f"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         </div>
         {open && (
@@ -157,10 +230,18 @@ function MultiSelect({ label, options, selected, onChange, placeholder, error, e
                   checked={selected.includes(opt)}
                   onChange={() => toggleOption(opt)}
                 />
-                <span className={`cpd-checkbox-custom ${selected.includes(opt) ? 'checked' : ''}`}>
+                <span
+                  className={`cpd-checkbox-custom ${selected.includes(opt) ? "checked" : ""}`}
+                >
                   {selected.includes(opt) && (
                     <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                      <path d="M2 6l3 3 5-5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      <path
+                        d="M2 6l3 3 5-5"
+                        stroke="#fff"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
                     </svg>
                   )}
                 </span>
@@ -184,17 +265,45 @@ function FileChip({ name, size, onRemove }) {
     <div className="cpd-file-chip">
       <div className="cpd-file-icon">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-          <rect x="3" y="1" width="14" height="18" rx="2" fill="#fff" stroke="#ddd" strokeWidth="1" />
-          <text x="10" y="14" textAnchor="middle" fill="#e53935" fontSize="6" fontWeight="700">PDF</text>
+          <rect
+            x="3"
+            y="1"
+            width="14"
+            height="18"
+            rx="2"
+            fill="#fff"
+            stroke="#ddd"
+            strokeWidth="1"
+          />
+          <text
+            x="10"
+            y="14"
+            textAnchor="middle"
+            fill="#e53935"
+            fontSize="6"
+            fontWeight="700"
+          >
+            PDF
+          </text>
         </svg>
       </div>
       <div className="cpd-file-info">
         <span className="cpd-file-name">{name}</span>
         <span className="cpd-file-meta">{size} | Uploaded</span>
       </div>
-      <button type="button" className="cpd-file-remove" onClick={onRemove} aria-label="Remove file">
+      <button
+        type="button"
+        className="cpd-file-remove"
+        onClick={onRemove}
+        aria-label="Remove file"
+      >
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-          <path d="M6 6l8 8M14 6l-8 8" stroke="#1d1d1f" strokeWidth="1.5" strokeLinecap="round" />
+          <path
+            d="M6 6l8 8M14 6l-8 8"
+            stroke="#1d1d1f"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+          />
         </svg>
       </button>
     </div>
@@ -205,34 +314,42 @@ export default function CreateProposalDrawer({ show, onClose }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const fileTypeOptions = [
-    { key: 'rfp', label: t('createProposal.fileTypeOptions.rfp') },
-    { key: 'requirementAnalysis', label: t('createProposal.fileTypeOptions.requirementAnalysis') },
-    { key: 'competitiveAnalysis', label: t('createProposal.fileTypeOptions.competitiveAnalysis') },
+    { key: "rfp", label: t("createProposal.fileTypeOptions.rfp") },
+    {
+      key: "requirementAnalysis",
+      label: t("createProposal.fileTypeOptions.requirementAnalysis"),
+    },
+    {
+      key: "competitiveAnalysis",
+      label: t("createProposal.fileTypeOptions.competitiveAnalysis"),
+    },
   ];
   const [formData, setFormData] = useState({
-    proposalName: '',
-    opportunityId: '',
-    clientName: '',
-    fileType: '',
-    industry: '',
+    proposalName: "",
+    opportunityId: "",
+    clientName: "",
+    fileType: "",
+    industry: "",
     serviceSegment: [],
-    internalExternal: '',
-    projectGoal: '',
+    internalExternal: "",
+    projectGoal: "",
     submissionDate: null,
   });
   const [uploadedFile, setUploadedFile] = useState(null);
-  const [uploadError, setUploadError] = useState('');
-  const [createProposalError, setCreateProposalError] = useState('');
-  const [proposalNameError, setProposalNameError] = useState('');
+  const [uploadError, setUploadError] = useState("");
+  const [createProposalError, setCreateProposalError] = useState("");
+  const [proposalNameError, setProposalNameError] = useState("");
   const [proposalNameChecking, setProposalNameChecking] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitPhase, setSubmitPhase] = useState('idle');
+  const [submitPhase, setSubmitPhase] = useState("idle");
   const [formErrors, setFormErrors] = useState({});
-  const [industryOptions, setIndustryOptions] = useState(fallbackIndustryOptions);
+  const [industryOptions, setIndustryOptions] = useState(
+    fallbackIndustryOptions,
+  );
   const [segmentOptions, setSegmentOptions] = useState(fallbackSegmentOptions);
   const fileInputRef = useRef(null);
   const [dragOver, setDragOver] = useState(false);
-  const requiredFieldMessage = t('createProposal.requiredField');
+  const requiredFieldMessage = t("createProposal.requiredField");
 
   useEffect(() => {
     let isMounted = true;
@@ -275,13 +392,14 @@ export default function CreateProposalDrawer({ show, onClose }) {
   };
 
   const handleChange = (field) => (e) => {
-    if (field === 'proposalName' && proposalNameError) {
-      setProposalNameError('');
+    if (field === "proposalName" && proposalNameError) {
+      setProposalNameError("");
     }
     clearFieldError(field);
-    const nextValue = field === 'opportunityId'
-      ? e.target.value.replace(/\D/g, '')
-      : e.target.value;
+    const nextValue =
+      field === "opportunityId"
+        ? e.target.value.replace(/\D/g, "")
+        : e.target.value;
     setFormData({ ...formData, [field]: nextValue });
   };
 
@@ -306,9 +424,9 @@ export default function CreateProposalDrawer({ show, onClose }) {
   const processFile = (file) => {
     if (!file) return;
 
-    setCreateProposalError('');
-    setUploadError('');
-    clearFieldError('file');
+    setCreateProposalError("");
+    setUploadError("");
+    clearFieldError("file");
     setUploadedFile(normalizeUploadedFile(file));
   };
 
@@ -317,7 +435,8 @@ export default function CreateProposalDrawer({ show, onClose }) {
     setDragOver(false);
     const { files } = e.dataTransfer;
     if (!files?.length) return;
-    if (files.length > 1) return setUploadError(t('createProposal.singleFileOnly'));
+    if (files.length > 1)
+      return setUploadError(t("createProposal.singleFileOnly"));
     processFile(files[0]);
   };
 
@@ -327,47 +446,54 @@ export default function CreateProposalDrawer({ show, onClose }) {
       processFile(file);
     }
 
-    e.target.value = '';
+    e.target.value = "";
   };
 
   const handleRemoveFile = () => {
     setUploadedFile(null);
-    setUploadError('');
+    setUploadError("");
   };
 
   const dismissCreateProposalError = () => {
-    setCreateProposalError('');
+    setCreateProposalError("");
   };
 
   const validateRequiredFields = () => {
     const nextErrors = {};
 
     if (!uploadedFile) nextErrors.file = requiredFieldMessage;
-    if (!formData.proposalName.trim()) nextErrors.proposalName = requiredFieldMessage;
-    if (!formData.opportunityId.trim()) nextErrors.opportunityId = requiredFieldMessage;
-    if (!formData.clientName.trim()) nextErrors.clientName = requiredFieldMessage;
+    if (!formData.proposalName.trim())
+      nextErrors.proposalName = requiredFieldMessage;
+    if (!formData.opportunityId.trim())
+      nextErrors.opportunityId = requiredFieldMessage;
+    if (!formData.clientName.trim())
+      nextErrors.clientName = requiredFieldMessage;
     if (!formData.fileType) nextErrors.fileType = requiredFieldMessage;
     if (!formData.industry) nextErrors.industry = requiredFieldMessage;
-    if (!formData.serviceSegment.length) nextErrors.serviceSegment = requiredFieldMessage;
-    if (!formData.internalExternal) nextErrors.internalExternal = requiredFieldMessage;
-    if (!formData.projectGoal.trim()) nextErrors.projectGoal = requiredFieldMessage;
-    if (!formData.submissionDate) nextErrors.submissionDate = requiredFieldMessage;
+    if (!formData.serviceSegment.length)
+      nextErrors.serviceSegment = requiredFieldMessage;
+    if (!formData.internalExternal)
+      nextErrors.internalExternal = requiredFieldMessage;
+    if (!formData.projectGoal.trim())
+      nextErrors.projectGoal = requiredFieldMessage;
+    if (!formData.submissionDate)
+      nextErrors.submissionDate = requiredFieldMessage;
 
     setFormErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
   };
 
   const isProposalNameValid = (payload) => {
-    if (typeof payload === 'boolean') return payload;
-    if (!payload || typeof payload !== 'object') return true;
+    if (typeof payload === "boolean") return payload;
+    if (!payload || typeof payload !== "object") return true;
 
-    if (typeof payload.valid === 'boolean') return payload.valid;
-    if (typeof payload.isValid === 'boolean') return payload.isValid;
-    if (typeof payload.available === 'boolean') return payload.available;
-    if (typeof payload.status === 'boolean') return payload.status;
-    if (typeof payload.success === 'boolean') return payload.success;
-    if (typeof payload.message === 'string') {
-      return !payload.message.toLowerCase().includes('exist');
+    if (typeof payload.valid === "boolean") return payload.valid;
+    if (typeof payload.isValid === "boolean") return payload.isValid;
+    if (typeof payload.available === "boolean") return payload.available;
+    if (typeof payload.status === "boolean") return payload.status;
+    if (typeof payload.success === "boolean") return payload.success;
+    if (typeof payload.message === "string") {
+      return !payload.message.toLowerCase().includes("exist");
     }
 
     return true;
@@ -377,7 +503,7 @@ export default function CreateProposalDrawer({ show, onClose }) {
     const proposalName = formData.proposalName.trim();
 
     if (!proposalName) {
-      setProposalNameError('');
+      setProposalNameError("");
       return;
     }
 
@@ -387,19 +513,21 @@ export default function CreateProposalDrawer({ show, onClose }) {
       const result = await validateProposalName(proposalName);
 
       if (!isProposalNameValid(result)) {
-        setProposalNameError(t('createProposal.proposalNameExists'));
+        setProposalNameError(t("createProposal.proposalNameExists"));
       } else {
-        setProposalNameError('');
+        setProposalNameError("");
       }
     } catch (error) {
-      setProposalNameError(error?.message || 'Unable to validate proposal name.');
+      setProposalNameError(
+        error?.message || "Unable to validate proposal name.",
+      );
     } finally {
       setProposalNameChecking(false);
     }
   };
 
   const parseSessionId = (payload) =>
-    payload?.sessionId ||
+    payload?.session_id ||
     payload?.data?.sessionId ||
     payload?.id ||
     payload?.data?.id ||
@@ -409,7 +537,7 @@ export default function CreateProposalDrawer({ show, onClose }) {
 
   const getUserId = () => {
     const user = getStoredUser();
-    return String(user?.user_id ?? user?.id ?? user?._id ?? '0');
+    return String(user?.user_id ?? user?.id ?? user?._id ?? "0");
   };
 
   const handleSubmit = async (e) => {
@@ -423,13 +551,13 @@ export default function CreateProposalDrawer({ show, onClose }) {
     if (proposalNameError || proposalNameChecking) {
       return;
     }
-    setCreateProposalError('');
+    setCreateProposalError("");
     setIsSubmitting(true);
-    setSubmitPhase('creating');
+    setSubmitPhase("creating");
 
     const dateStr = formData.submissionDate
-      ? `${String(formData.submissionDate.getMonth() + 1).padStart(2, '0')},${String(formData.submissionDate.getDate()).padStart(2, '0')},${formData.submissionDate.getFullYear()}`
-      : '';
+      ? `${String(formData.submissionDate.getMonth() + 1).padStart(2, "0")},${String(formData.submissionDate.getDate()).padStart(2, "0")},${formData.submissionDate.getFullYear()}`
+      : "";
 
     const userId = getUserId();
 
@@ -449,15 +577,15 @@ export default function CreateProposalDrawer({ show, onClose }) {
       const createResponse = await createProposal(createPayload);
       const sessionId = parseSessionId(createResponse);
       if (!sessionId) {
-        throw new Error('Session ID was not returned from create-proposal.');
+        throw new Error("Session ID was not returned from create-proposal.");
       }
 
       const fileForUpload = uploadedFile?.raw || null;
       if (!fileForUpload) {
-        throw new Error('File is required.');
+        throw new Error("File is required.");
       }
 
-      setSubmitPhase('uploading');
+      setSubmitPhase("uploading");
       const uploadResponse = await uploadFile(fileForUpload, {
         user_id: userId,
         client_name: formData.clientName,
@@ -491,9 +619,9 @@ export default function CreateProposalDrawer({ show, onClose }) {
       });
       onClose();
     } catch (error) {
-      setCreateProposalError(error?.message || 'Failed to create proposal.');
+      setCreateProposalError(error?.message || "Failed to create proposal.");
     } finally {
-      setSubmitPhase('idle');
+      setSubmitPhase("idle");
       setIsSubmitting(false);
     }
   };
@@ -504,10 +632,19 @@ export default function CreateProposalDrawer({ show, onClose }) {
     <div className="cpd-overlay">
       <div className="cpd-drawer">
         <div className="cpd-topbar">
-          <span className="cpd-topbar-title">{t('createProposal.title')}</span>
-          <button className="cpd-close-btn" onClick={onClose} aria-label="Close">
+          <span className="cpd-topbar-title">{t("createProposal.title")}</span>
+          <button
+            className="cpd-close-btn"
+            onClick={onClose}
+            aria-label="Close"
+          >
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M5 5l10 10M15 5L5 15" stroke="#1d1d1f" strokeWidth="1.8" strokeLinecap="round" />
+              <path
+                d="M5 5l10 10M15 5L5 15"
+                stroke="#1d1d1f"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+              />
             </svg>
           </button>
         </div>
@@ -521,7 +658,12 @@ export default function CreateProposalDrawer({ show, onClose }) {
               aria-label="Dismiss error"
             >
               <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-                <path d="M5 5l10 10M15 5L5 15" stroke="#8F8F8F" strokeWidth="1.8" strokeLinecap="round" />
+                <path
+                  d="M5 5l10 10M15 5L5 15"
+                  stroke="#8F8F8F"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                />
               </svg>
             </button>
           </div>
@@ -529,28 +671,43 @@ export default function CreateProposalDrawer({ show, onClose }) {
 
         <div className="cpd-content">
           <form onSubmit={handleSubmit}>
-            <h2 className="cpd-heading">{t('createProposal.heading')}</h2>
-            <p className="cpd-subtext">
-              {t('createProposal.subtext')}
-            </p>
+            <h2 className="cpd-heading">{t("createProposal.heading")}</h2>
+            <p className="cpd-subtext">{t("createProposal.subtext")}</p>
 
             {/* Upload area */}
             <div
-              className={`cpd-upload-area ${dragOver ? 'drag-over' : ''}${formErrors.file ? ' cpd-upload-area-error' : ''}`}
-              onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+              className={`cpd-upload-area ${dragOver ? "drag-over" : ""}${formErrors.file ? " cpd-upload-area-error" : ""}`}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setDragOver(true);
+              }}
               onDragLeave={() => setDragOver(false)}
               onDrop={handleFileDrop}
             >
               <>
                 <div className="cpd-upload-icon">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 16V4m0 0l-4 4m4-4l4 4" stroke="#09121F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke="#09121F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <path
+                      d="M12 16V4m0 0l-4 4m4-4l4 4"
+                      stroke="#09121F"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"
+                      stroke="#09121F"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 </div>
-                <p className="cpd-upload-title">{t('createProposal.uploadLabel')}</p>
+                <p className="cpd-upload-title">
+                  {t("createProposal.uploadLabel")}
+                </p>
                 <p className="cpd-upload-hint">
-                  {t('createProposal.uploadOr')}
+                  {t("createProposal.uploadOr")}
                 </p>
                 <button
                   type="button"
@@ -558,7 +715,7 @@ export default function CreateProposalDrawer({ show, onClose }) {
                   disabled={isSubmitting}
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  {t('createProposal.browseFiles')}
+                  {t("createProposal.browseFiles")}
                 </button>
               </>
               <input
@@ -590,16 +747,20 @@ export default function CreateProposalDrawer({ show, onClose }) {
               />
             )}
 
-            <h2 className="cpd-section-heading">{t('createProposal.addDetails')}</h2>
+            <h2 className="cpd-section-heading">
+              {t("createProposal.addDetails")}
+            </h2>
 
             <div className="cpd-field">
-              <label className="cpd-label">{t('createProposal.proposalName')}</label>
+              <label className="cpd-label">
+                {t("createProposal.proposalName")}
+              </label>
               <input
                 type="text"
-                className={`cpd-input${proposalNameError || formErrors.proposalName ? ' cpd-input-error' : ''}`}
-                placeholder={t('createProposal.proposalNamePlaceholder')}
+                className={`cpd-input${proposalNameError || formErrors.proposalName ? " cpd-input-error" : ""}`}
+                placeholder={t("createProposal.proposalNamePlaceholder")}
                 value={formData.proposalName}
-                onChange={handleChange('proposalName')}
+                onChange={handleChange("proposalName")}
                 onBlur={handleProposalNameBlur}
               />
               {(proposalNameError || formErrors.proposalName) && (
@@ -610,14 +771,16 @@ export default function CreateProposalDrawer({ show, onClose }) {
             </div>
 
             <div className="cpd-field">
-              <label className="cpd-label">{t('createProposal.opportunityId')}</label>
+              <label className="cpd-label">
+                {t("createProposal.opportunityId")}
+              </label>
               <input
                 type="text"
                 inputMode="numeric"
-                className={`cpd-input${formErrors.opportunityId ? ' cpd-input-error' : ''}`}
-                placeholder={t('createProposal.opportunityIdPlaceholder')}
+                className={`cpd-input${formErrors.opportunityId ? " cpd-input-error" : ""}`}
+                placeholder={t("createProposal.opportunityIdPlaceholder")}
                 value={formData.opportunityId}
-                onChange={handleChange('opportunityId')}
+                onChange={handleChange("opportunityId")}
               />
               {formErrors.opportunityId && (
                 <div className="cpd-field-error" role="alert">
@@ -627,13 +790,15 @@ export default function CreateProposalDrawer({ show, onClose }) {
             </div>
 
             <div className="cpd-field">
-              <label className="cpd-label">{t('createProposal.clientName')}</label>
+              <label className="cpd-label">
+                {t("createProposal.clientName")}
+              </label>
               <input
                 type="text"
-                className={`cpd-input${formErrors.clientName ? ' cpd-input-error' : ''}`}
-                placeholder={t('createProposal.clientNamePlaceholder')}
+                className={`cpd-input${formErrors.clientName ? " cpd-input-error" : ""}`}
+                placeholder={t("createProposal.clientNamePlaceholder")}
                 value={formData.clientName}
-                onChange={handleChange('clientName')}
+                onChange={handleChange("clientName")}
               />
               {formErrors.clientName && (
                 <div className="cpd-field-error" role="alert">
@@ -643,56 +808,58 @@ export default function CreateProposalDrawer({ show, onClose }) {
             </div>
 
             <CustomSelect
-              label={t('createProposal.fileType')}
+              label={t("createProposal.fileType")}
               options={fileTypeOptions}
               value={formData.fileType}
-              onChange={handleSelectChange('fileType')}
-              placeholder={t('createProposal.fileTypePlaceholder')}
+              onChange={handleSelectChange("fileType")}
+              placeholder={t("createProposal.fileTypePlaceholder")}
               error={Boolean(formErrors.fileType)}
               errorMessage={formErrors.fileType}
             />
 
             <CustomSelect
-              label={t('createProposal.industry')}
+              label={t("createProposal.industry")}
               options={industryOptions}
               value={formData.industry}
-              onChange={handleSelectChange('industry')}
-              placeholder={t('createProposal.industryPlaceholder')}
+              onChange={handleSelectChange("industry")}
+              placeholder={t("createProposal.industryPlaceholder")}
               error={Boolean(formErrors.industry)}
               errorMessage={formErrors.industry}
             />
 
             <MultiSelect
-              label={t('createProposal.service')}
+              label={t("createProposal.service")}
               options={segmentOptions}
               selected={formData.serviceSegment}
               onChange={(val) => {
-                clearFieldError('serviceSegment');
+                clearFieldError("serviceSegment");
                 setFormData({ ...formData, serviceSegment: val });
               }}
-              placeholder={t('createProposal.servicePlaceholder')}
+              placeholder={t("createProposal.servicePlaceholder")}
               error={Boolean(formErrors.serviceSegment)}
               errorMessage={formErrors.serviceSegment}
             />
 
             <CustomSelect
-              label={t('createProposal.internalExternal')}
+              label={t("createProposal.internalExternal")}
               options={typeOptions}
               value={formData.internalExternal}
-              onChange={handleSelectChange('internalExternal')}
-              placeholder={t('createProposal.internalExternalPlaceholder')}
+              onChange={handleSelectChange("internalExternal")}
+              placeholder={t("createProposal.internalExternalPlaceholder")}
               error={Boolean(formErrors.internalExternal)}
               errorMessage={formErrors.internalExternal}
             />
 
             <div className="cpd-field">
-              <label className="cpd-label">{t('createProposal.projectGoal')}</label>
+              <label className="cpd-label">
+                {t("createProposal.projectGoal")}
+              </label>
               <textarea
-                className={`cpd-textarea${formErrors.projectGoal ? ' cpd-input-error' : ''}`}
-                placeholder={t('createProposal.projectGoalPlaceholder')}
+                className={`cpd-textarea${formErrors.projectGoal ? " cpd-input-error" : ""}`}
+                placeholder={t("createProposal.projectGoalPlaceholder")}
                 rows={4}
                 value={formData.projectGoal}
-                onChange={handleChange('projectGoal')}
+                onChange={handleChange("projectGoal")}
               />
               {formErrors.projectGoal && (
                 <div className="cpd-field-error" role="alert">
@@ -702,13 +869,17 @@ export default function CreateProposalDrawer({ show, onClose }) {
             </div>
 
             <div className="cpd-field cpd-field-date">
-              <label className="cpd-label">{t('createProposal.submissionDate')}</label>
-              <div className={formErrors.submissionDate ? 'cpd-date-error' : ''}>
+              <label className="cpd-label">
+                {t("createProposal.submissionDate")}
+              </label>
+              <div
+                className={formErrors.submissionDate ? "cpd-date-error" : ""}
+              >
                 <DatePicker
                   value={formData.submissionDate}
                   onlyToday
                   onChange={(date) => {
-                    clearFieldError('submissionDate');
+                    clearFieldError("submissionDate");
                     setFormData({ ...formData, submissionDate: date });
                   }}
                 />
@@ -721,12 +892,16 @@ export default function CreateProposalDrawer({ show, onClose }) {
             </div>
 
             <div className="cpd-footer">
-              <button type="submit" className="cpd-submit-btn" disabled={isSubmitting || proposalNameChecking}>
-                {submitPhase === 'uploading'
-                  ? t('createProposal.uploading')
-                  : submitPhase === 'creating'
-                    ? t('createProposal.creatingProposal')
-                    : t('createProposal.createBtn')}
+              <button
+                type="submit"
+                className="cpd-submit-btn"
+                disabled={isSubmitting || proposalNameChecking}
+              >
+                {submitPhase === "uploading"
+                  ? t("createProposal.uploading")
+                  : submitPhase === "creating"
+                    ? t("createProposal.creatingProposal")
+                    : t("createProposal.createBtn")}
               </button>
             </div>
           </form>
