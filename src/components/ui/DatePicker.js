@@ -134,9 +134,12 @@ export default function DatePicker({ label, value, onChange, onlyToday = false }
 
   return (
     <div className="dp-wrapper" ref={ref}>
-      <div
+      <button
+        type="button"
         className={`dp-trigger ${open ? 'open' : ''}`}
         onClick={() => setOpen(!open)}
+        aria-expanded={open}
+        aria-haspopup="dialog"
       >
         <span className={value ? 'dp-value' : 'dp-placeholder'}>
           {value ? formatDate(value) : 'Select date'}
@@ -147,7 +150,7 @@ export default function DatePicker({ label, value, onChange, onlyToday = false }
           <line x1="6" y1="1" x2="6" y2="5" stroke="#1d1d1f" strokeWidth="1.5" strokeLinecap="round" />
           <line x1="14" y1="1" x2="14" y2="5" stroke="#1d1d1f" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
-      </div>
+      </button>
 
       {open && (
         <div className="dp-dropdown">

@@ -1281,6 +1281,13 @@
   animation-delay: -0.16s;
 }
 
+.pcr-typing-text {
+  margin: 6px 0 0;
+  color: #6f7785;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
 .pcr-agent-plan {
   background: #ffffff;
   border-radius: 8px;

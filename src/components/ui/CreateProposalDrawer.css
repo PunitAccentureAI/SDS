@@ -654,3 +654,20 @@
 .cpd-chip-remove:hover {
   background-color: rgba(33, 137, 255, 0.15);
 }
+
+/* Visible keyboard focus for tab navigation */
+.cpd-close-btn:focus-visible,
+.cpd-error-popup-close:focus-visible,
+.cpd-browse-btn:focus-visible,
+.cpd-file-remove:focus-visible,
+.cpd-input:focus-visible,
+.cpd-custom-select-trigger:focus-visible,
+.cpd-custom-dropdown-item:focus-visible,
+.cpd-multi-trigger:focus-visible,
+.cpd-checkbox:focus-visible + .cpd-checkbox-custom,
+.cpd-chip-remove:focus-visible,
+.cpd-textarea:focus-visible,
+.cpd-submit-btn:focus-visible {
+  outline: 2px solid #2189ff;
+  outline-offset: 2px;
+}

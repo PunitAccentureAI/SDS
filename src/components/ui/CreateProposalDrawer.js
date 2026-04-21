@@ -174,9 +174,12 @@ function MultiSelect({
     <div className="cpd-field" ref={ref}>
       <label className="cpd-label">{label}</label>
       <div className="cpd-custom-select-wrapper">
-        <div
+        <button
+          type="button"
           className={`cpd-multi-trigger ${open ? "open" : ""} ${selected.length > 0 ? "has-chips" : ""}${error ? " cpd-input-error" : ""}`}
           onClick={() => setOpen(!open)}
+          aria-expanded={open}
+          aria-haspopup="listbox"
         >
           {selected.length > 0 ? (
             <div className="cpd-chips-area">
@@ -220,9 +223,9 @@ function MultiSelect({
               strokeLinejoin="round"
             />
           </svg>
-        </div>
+        </button>
         {open && (
-          <div className="cpd-custom-dropdown cpd-multi-dropdown">
+          <div className="cpd-custom-dropdown cpd-multi-dropdown" role="listbox" aria-label={label}>
             {options.map((opt) => (
               <label key={opt} className="cpd-multi-item">
                 <input
@@ -349,6 +352,7 @@ export default function CreateProposalDrawer({ show, onClose }) {
   );
   const [segmentOptions, setSegmentOptions] = useState(fallbackSegmentOptions);
   const fileInputRef = useRef(null);
+  const closeButtonRef = useRef(null);
   const [dragOver, setDragOver] = useState(false);
   const requiredFieldMessage = t("createProposal.requiredField");
 
@@ -382,6 +386,11 @@ export default function CreateProposalDrawer({ show, onClose }) {
       isMounted = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (!show) return;
+    closeButtonRef.current?.focus();
+  }, [show]);
 
   const clearFieldError = (field) => {
     setFormErrors((prev) => {
@@ -634,11 +643,12 @@ export default function CreateProposalDrawer({ show, onClose }) {
   if (!show) return null;
 
   return (
-    <div className="cpd-overlay">
-      <div className="cpd-drawer">
+    <div className="cpd-overlay" onKeyDown={(e) => (e.key === "Escape" ? onClose() : null)}>
+      <div className="cpd-drawer" role="dialog" aria-modal="true" aria-labelledby="cpd-title">
         <div className="cpd-topbar">
-          <span className="cpd-topbar-title">{t("createProposal.title")}</span>
+          <span id="cpd-title" className="cpd-topbar-title">{t("createProposal.title")}</span>
           <button
+            ref={closeButtonRef}
             className="cpd-close-btn"
             onClick={onClose}
             aria-label="Close"

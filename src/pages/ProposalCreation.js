@@ -144,12 +144,14 @@ export default function ProposalCreation() {
     const handleDisconnect = () => {
       isSocketConnectedRef.current = false;
       setIsSocketConnected(false);
+      setAiTyping(false);
       setShowSocketIssuePopup(true);
     };
 
     const handleConnectError = () => {
       isSocketConnectedRef.current = false;
       setIsSocketConnected(false);
+      setAiTyping(false);
       setShowSocketIssuePopup(true);
     };
 
@@ -289,7 +291,7 @@ export default function ProposalCreation() {
     const outgoingMessageType = lastSocketOutputType === 'hil_output' ? 'hil_input' : 'user_input';
     setMessages((prev) => [...prev, { role: 'user', text: userMessage }]);
     setReplyText('');
-    emitProposalChatMessage({
+    const sent = emitProposalChatMessage({
       message: userMessage,
       type: 'user_input',
       meta: {
@@ -299,6 +301,9 @@ export default function ProposalCreation() {
         supportFiles: supportFiles.map((file) => ({ id: file.id, name: file.name, type: file.type })),
       },
     });
+    if (sent) {
+      setAiTyping(true);
+    }
 
     if (flowState === 'supporting-docs') {
       setFlowState('ready-to-generate');
@@ -1019,6 +1024,7 @@ export default function ProposalCreation() {
                     <div className="pcr-typing-indicator">
                       <span /><span /><span />
                     </div>
+                    <p className="pcr-typing-text">Generating response, this may take up to 5 minutes...</p>
                   </div>
                 </div>
               )}
