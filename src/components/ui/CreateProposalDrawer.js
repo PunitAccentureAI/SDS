@@ -7,6 +7,7 @@ import { uploadFile } from "../../services/fileService";
 import { getStoredUser } from "../../services/authService";
 import {
   createProposal,
+  cacheProposalDetails,
   validateProposalName,
   getIndustryOptions,
   getSegmentOptions,
@@ -600,22 +601,26 @@ export default function CreateProposalDrawer({ show, onClose }) {
         uploadResponse?.data?.fileId ??
         null;
 
+      const proposalState = {
+        proposalName: formData.proposalName,
+        opportunityId: formData.opportunityId,
+        clientName: formData.clientName,
+        fileType: formData.fileType,
+        industry: formData.industry,
+        serviceSegment: formData.serviceSegment,
+        internalExternal: formData.internalExternal,
+        projectGoal: formData.projectGoal,
+        submissionDate: dateStr,
+        sessionId,
+        fileName: uploadedFile?.name || null,
+        fileId,
+        uploadedFile: null,
+      };
+
+      cacheProposalDetails(sessionId, proposalState);
+
       navigate(`/proposal/new/${encodeURIComponent(sessionId)}`, {
-        state: {
-          proposalName: formData.proposalName,
-          opportunityId: formData.opportunityId,
-          clientName: formData.clientName,
-          fileType: formData.fileType,
-          industry: formData.industry,
-          serviceSegment: formData.serviceSegment,
-          internalExternal: formData.internalExternal,
-          projectGoal: formData.projectGoal,
-          submissionDate: dateStr,
-          sessionId,
-          fileName: uploadedFile?.name || null,
-          fileId,
-          uploadedFile: null,
-        },
+        state: proposalState,
       });
       onClose();
     } catch (error) {

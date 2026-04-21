@@ -1,145 +1,29 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { marked } from 'marked';
 import { useUploadFileMutation } from '../hooks/useFiles';
+import { useProposalDetails } from '../hooks/useProposalDetails';
+import { getStoredUser } from '../services/authService';
+import { fetchFilesList } from '../services/fileService';
 import InternalEnterpriseSearch from './InternalEnterpriseSearch';
 import { createProposalChatSocket, PROPOSAL_CHAT_SOCKET_EVENTS } from '../services/proposalChatSocket';
+import {
+  uploadedSupportFiles,
+  documentTabFiles,
+  proposalOutlineSections,
+  businessRequirements,
+  functionalRequirements,
+} from '../data/proposalCreationData';
+import { inferDocType } from '../utils/proposalUtils';
+import {
+  DocMenuIconEye,
+  DocMenuIconDownload,
+  DocMenuIconDelete,
+  SparklesIcon,
+  ReplyCloseIcon,
+} from './proposalCreation/icons';
 import './ProposalCreation.css';
-
-const quickActions = [
-  'Proposal storyboard',
-  'Requirements analysis',
-  'Differentiation strategy',
-  'Proposal Review',
-  'Competitive analysis',
-];
-
-const uploadedSupportFiles = [
-  { id: 1, name: 'Research file 1.ppt', type: 'PPT' },
-];
-
-const documentTabFiles = [
-  { id: 'doc-1', name: 'Wooribank_RFP.pdf', type: 'PDF', source: 'User' },
-  { id: 'doc-2', name: 'Research_2026', type: 'DOC', source: 'System' },
-  { id: 'doc-3', name: 'Research_2025', type: 'PPT', source: 'User' },
-  { id: 'doc-4', name: 'Research_2022', type: 'XLS', source: 'User' },
-];
-
-const proposalOutlineSections = [
-  { id: 'business', titleKey: 'outlineBusinessRequirements', children: [], expandable: true },
-  {
-    id: 'functional',
-    titleKey: 'outlineFunctionalRequirements',
-    highlight: true,
-    expandable: true,
-    children: [
-      { id: 'functional-1', titleKey: 'outlineDataIngestion' },
-      { id: 'functional-2', titleKey: 'outlineModelTraining' },
-      { id: 'functional-3', titleKey: 'outlinePredictionAnalytics' },
-      { id: 'functional-4', titleKey: 'outlineUserInterfaces' },
-    ],
-  },
-  { id: 'placeholder-1', titleKey: 'outlineSectionName', children: [], expandable: true },
-  { id: 'placeholder-2', titleKey: 'outlineSectionName', children: [], expandable: true },
-];
-
-function inferDocType(name = '', explicitType) {
-  if (explicitType) return String(explicitType).toUpperCase();
-  const ext = name.split('.').pop()?.toUpperCase() || 'FILE';
-  const map = {
-    PDF: 'PDF',
-    DOC: 'DOC',
-    DOCX: 'DOC',
-    PPT: 'PPT',
-    PPTX: 'PPT',
-    XLS: 'XLS',
-    XLSX: 'XLS',
-  };
-  return map[ext] || (ext.length <= 4 ? ext : 'FILE');
-}
-
-const businessRequirements = [
-  { id: 'B-01', requirement: 'Automate loan underwriting', objective: 'Reduce processing time by 50%; achieve approval accuracy > 95%' },
-  { id: 'B-02', requirement: 'Operate a 24/7 customer-service chatbot', objective: 'Provide uninterrupted support; achieve First-Call-Resolution (FCR) > 80%' },
-  { id: 'B-03', requirement: 'Improve marketing targeting', objective: 'Increase personalized product-recommendation rate by 30% through behavioral data analysis' },
-  { id: 'B-04', requirement: 'Build a fraud-detection model', objective: 'Detect suspicious transactions with a reduction-rate ≥ 90% in real time' },
-  { id: 'B-05', requirement: 'Enhance internal workflow efficiency', objective: 'Cut employee-task time by 20% via automatic document classification and summarization' },
-];
-
-const functionalRequirements = [
-  {
-    title: 'Data Ingestion & Pre-processing',
-    points: [
-      'Connect to various sources: real-time transaction logs, customer behavior logs, call-center recordings, etc.',
-      'Automatic cleansing pipeline for missing or corrupted data.',
-    ],
-  },
-  {
-    title: 'Model Training & Deployment',
-    points: [
-      'Support AutoML with automatic hyper-parameter tuning.',
-      'Model versioning and A/B-testing environment.',
-    ],
-  },
-  {
-    title: 'Prediction & Analytics Services',
-    points: [
-      'Provide inference via RESTful APIs.',
-      'Support both real-time streaming predictions and batch predictions.',
-    ],
-  },
-];
-
-function DocMenuIconEye() {
-  return (
-    <svg className="pcr-doctab-menu-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
-    </svg>
-  );
-}
-
-function DocMenuIconDownload() {
-  return (
-    <svg className="pcr-doctab-menu-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-      <path d="M7 10l5 5 5-5M12 15V3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function DocMenuIconDelete() {
-  return (
-    <svg className="pcr-doctab-menu-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M10 11v6M14 11v6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function SparklesIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-      <path d="M10 2l1.5 3.5L15 7l-3.5 1.5L10 12l-1.5-3.5L5 7l3.5-1.5L10 2z" fill="#000" />
-      <path d="M15 12l1 2 2 1-2 1-1 2-1-2-2-1 2-1 1-2z" fill="#000" />
-      <path d="M4 14l.75 1.5L6 16.25l-1.25.75L4 18.5l-.75-1.5L2 16.25l1.25-.75L4 14z" fill="#000" />
-    </svg>
-  );
-}
-
-function ReplyCloseIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-      <path d="M5 5l10 10M15 5L5 15" stroke="#09121F" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  );
-}
 
 export default function ProposalCreation() {
   const { t } = useTranslation();
@@ -155,45 +39,95 @@ export default function ProposalCreation() {
 
   const sessionIdFromUrl = searchParams.get('sessionId') || '';
   const sessionId = formData.sessionId || sessionIdFromPath || sessionIdFromUrl;
-  const proposalName = formData.proposalName || 'Untitled Proposal';
-  const clientName = formData.clientName || '';
-  const fileName = formData.fileName || null;
-  const initialEnterpriseReference = formData.enterpriseReference || null;
+  const { proposalContext, isProposalDetailsLoading } = useProposalDetails({ sessionId, formData });
+  const proposalName = proposalContext.proposalName || 'Untitled Proposal';
+  const clientName = proposalContext.clientName || '';
+  const fileType = proposalContext.fileType || '';
+  const fileName = proposalContext.fileName || null;
+  const initialEnterpriseReference = proposalContext.enterpriseReference || null;
 
   const [activeTab, setActiveTab] = useState('ai-chat');
   const [toastVisible, setToastVisible] = useState(true);
   const [replyText, setReplyText] = useState('');
   const [messages, setMessages] = useState([]);
-  const [showQuickActions, setShowQuickActions] = useState(true);
-  const [showYesNo, setShowYesNo] = useState(false);
   const [aiTyping, setAiTyping] = useState(false);
   const [flowState, setFlowState] = useState('initial');
   const [supportFiles, setSupportFiles] = useState([]);
   const [agentPlan, setAgentPlan] = useState(null);
   const [documentStatus, setDocumentStatus] = useState('blank');
   const [demoDocuments, setDemoDocuments] = useState(() => documentTabFiles.map((d) => ({ ...d })));
+  const [fetchedDocuments, setFetchedDocuments] = useState([]);
+  const [isFilesListLoading, setIsFilesListLoading] = useState(false);
+  const [filesListError, setFilesListError] = useState('');
   const [selectedDocumentId, setSelectedDocumentId] = useState(documentTabFiles[1].id);
   const [documentsMenuOpenId, setDocumentsMenuOpenId] = useState(null);
   const documentsMenuRef = useRef(null);
   const [outlineOpenIds, setOutlineOpenIds] = useState(() => new Set(['functional']));
   const [isDragOver, setIsDragOver] = useState(false);
   const [enterpriseReference, setEnterpriseReference] = useState(initialEnterpriseReference);
-  const [showEnterpriseReference, setShowEnterpriseReference] = useState(Boolean(initialEnterpriseReference));
+  const [showEnterpriseReference, setShowEnterpriseReference] = useState(false);
   const [enterpriseSearchDrawerOpen, setEnterpriseSearchDrawerOpen] = useState(false);
   const [isSocketConnected, setIsSocketConnected] = useState(false);
   const [showSocketIssuePopup, setShowSocketIssuePopup] = useState(false);
+  const [lastSocketOutputType, setLastSocketOutputType] = useState('');
   const uploadFileMutation = useUploadFileMutation();
 
   const previewTitle = `${proposalName === 'Untitled Proposal' ? 'Wooribank' : proposalName} Requirements Analysis`;
-  const canShowPromptField = flowState !== 'initial';
+  const canShowPromptField = true;
   const isUploadingSupportFile = uploadFileMutation.isPending;
+  const currentUser = getStoredUser();
+  const userId = Number(currentUser?.user_id ?? currentUser?.id ?? currentUser?._id ?? 0);
+
+  const normalizeFetchedFiles = (payload) => {
+    const list = Array.isArray(payload)
+      ? payload
+      : Array.isArray(payload?.data)
+        ? payload.data
+        : Array.isArray(payload?.results)
+          ? payload.results
+          : [];
+
+    return list.map((item, idx) => ({
+      id: item?.id ?? item?.file_id ?? `${item?.name || 'file'}-${idx}`,
+      name: item?.name || item?.file_name || `File ${idx + 1}`,
+      type: inferDocType(item?.name || item?.file_name || '', item?.file_type),
+      source: item?.source || 'User',
+      status: item?.status || '-',
+    }));
+  };
+
+  const loadFilesList = async () => {
+    if (!sessionId) return;
+    setIsFilesListLoading(true);
+    setFilesListError('');
+    try {
+      const result = await fetchFilesList({
+        user_id: userId,
+        session_id: sessionId,
+      });
+      setFetchedDocuments(normalizeFetchedFiles(result));
+    } catch (error) {
+      setFilesListError(error?.message || 'Failed to load files list.');
+    } finally {
+      setIsFilesListLoading(false);
+    }
+  };
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, showYesNo, aiTyping]);
+  }, [messages, aiTyping]);
 
   useEffect(() => {
-    const socket = createProposalChatSocket({ proposalName, clientName, sessionId });
+    if (!toastVisible) return undefined;
+    const timer = setTimeout(() => {
+      setToastVisible(false);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [toastVisible]);
+
+  useEffect(() => {
+    if (isProposalDetailsLoading) return undefined;
+    const socket = createProposalChatSocket({ proposalName, clientName, fileType, sessionId });
     chatSocketRef.current = socket;
 
     const handleConnect = () => {
@@ -224,13 +158,14 @@ export default function ProposalCreation() {
     };
 
     const handleAiMessage = (payload) => {
+      const socketMessageType = String(payload?.type || '').toLowerCase();
       const text = payload?.message || payload?.text;
       if (!text) return;
+      if (socketMessageType) {
+        setLastSocketOutputType(socketMessageType);
+      }
       setAiTyping(false);
       setMessages((prev) => [...prev, { role: 'ai', text }]);
-      if (payload?.showYesNo) {
-        setShowYesNo(true);
-      }
     };
 
     socket.on(PROPOSAL_CHAT_SOCKET_EVENTS.CONNECT, handleConnect);
@@ -251,13 +186,15 @@ export default function ProposalCreation() {
       isSocketConnectedRef.current = false;
       setIsSocketConnected(false);
     };
-  }, [proposalName, clientName, sessionId]);
+  }, [proposalName, clientName, fileType, sessionId, isProposalDetailsLoading]);
 
   useEffect(() => {
     if (activeTab !== 'documents') {
       setDocumentsMenuOpenId(null);
+      return;
     }
-  }, [activeTab]);
+    loadFilesList();
+  }, [activeTab, sessionId]);
 
   useEffect(() => {
     if (!documentsMenuOpenId) return undefined;
@@ -271,12 +208,12 @@ export default function ProposalCreation() {
   }, [documentsMenuOpenId]);
 
   useEffect(() => {
-    const list = supportFiles.length > 0 ? supportFiles : demoDocuments;
+    const list = fetchedDocuments.length > 0 ? fetchedDocuments : supportFiles.length > 0 ? supportFiles : demoDocuments;
     const ids = new Set(list.map((item) => item.id));
     if (list.length > 0 && !ids.has(selectedDocumentId)) {
       setSelectedDocumentId(list[0].id);
     }
-  }, [supportFiles, demoDocuments, selectedDocumentId]);
+  }, [fetchedDocuments, supportFiles, demoDocuments, selectedDocumentId]);
 
   useEffect(() => {
     if (flowState !== 'generating' && flowState !== 'regenerating' && flowState !== 'retrying') {
@@ -325,13 +262,6 @@ export default function ProposalCreation() {
       });
       setDocumentStatus('ready');
       setFlowState('review');
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: 'ai',
-          text: 'Your proposal is ready to review.\nDo you have any further feedback?',
-        },
-      ]);
     }, 2200);
 
     return () => clearTimeout(timer);
@@ -353,51 +283,19 @@ export default function ProposalCreation() {
     return true;
   };
 
-  const handleQuickAction = (action) => {
-    setMessages((prev) => [...prev, { role: 'user', text: action }]);
-    setShowQuickActions(false);
-    setFlowState('awaiting-docs');
-    emitProposalChatMessage({ message: action, type: 'quick-action' });
-  };
-
-  const handleYesNo = (answer) => {
-    setMessages((prev) => [...prev, { role: 'user', text: answer }]);
-    setShowYesNo(false);
-    emitProposalChatMessage({ message: answer, type: 'yes-no' });
-    if (flowState === 'awaiting-docs') {
-      if (answer === 'Yes') {
-        setSupportFiles(uploadedSupportFiles);
-        setFlowState('supporting-docs');
-        setReplyText('Use the attached documents');
-      } else {
-        setFlowState('ready-to-generate');
-      }
-      return;
-    }
-
-    if (flowState === 'ready-to-generate') {
-      if (answer === 'Yes') {
-        setFlowState('generating');
-      }
-      return;
-    }
-
-    if (answer === 'Yes') {
-      setFlowState('generating');
-    }
-  };
-
   const handleSendMessage = () => {
     if (!replyText.trim()) return;
     const userMessage = replyText.trim();
+    const outgoingMessageType = lastSocketOutputType === 'hil_output' ? 'hil_input' : 'user_input';
     setMessages((prev) => [...prev, { role: 'user', text: userMessage }]);
     setReplyText('');
-    setShowYesNo(false);
-    setShowQuickActions(false);
     emitProposalChatMessage({
       message: userMessage,
-      type: 'user-message',
+      type: 'user_input',
       meta: {
+        messageType: outgoingMessageType,
+        clientName,
+        fileType,
         supportFiles: supportFiles.map((file) => ({ id: file.id, name: file.name, type: file.type })),
       },
     });
@@ -454,8 +352,6 @@ export default function ProposalCreation() {
       const withoutUserFiles = prev.filter((m) => m.role !== 'user-file');
       return [...withoutUserFiles, { role: 'user-file', name: file.name, size: `${sizeMB} MB`, ext }];
     });
-    setShowQuickActions(false);
-    setShowYesNo(false);
     setFlowState('supporting-docs');
     setReplyText((prev) => prev || 'Use the attached documents');
     emitProposalChatMessage({
@@ -563,19 +459,19 @@ export default function ProposalCreation() {
   };
 
   const detailLines = [];
-  if (formData.proposalName) detailLines.push({ key: t('createProposal.proposalName'), val: formData.proposalName });
-  if (formData.opportunityId) detailLines.push({ key: t('createProposal.opportunityId'), val: formData.opportunityId });
-  if (formData.clientName) detailLines.push({ key: t('createProposal.clientName'), val: formData.clientName });
-  if (formData.fileType) {
+  if (proposalContext.proposalName) detailLines.push({ key: t('createProposal.proposalName'), val: proposalContext.proposalName });
+  if (proposalContext.opportunityId) detailLines.push({ key: t('createProposal.opportunityId'), val: proposalContext.opportunityId });
+  if (proposalContext.clientName) detailLines.push({ key: t('createProposal.clientName'), val: proposalContext.clientName });
+  if (proposalContext.fileType) {
     detailLines.push({
       key: t('createProposal.fileType'),
-      val: t(`createProposal.fileTypeOptions.${formData.fileType}`),
+      val: t(`createProposal.fileTypeOptions.${proposalContext.fileType}`),
     });
   }
-  if (formData.industry) detailLines.push({ key: t('createProposal.industry'), val: formData.industry });
-  if (formData.serviceSegment?.length) detailLines.push({ key: t('createProposal.service'), val: formData.serviceSegment.join(', ') });
-  if (formData.internalExternal) detailLines.push({ key: t('createProposal.internalExternal'), val: formData.internalExternal });
-  if (formData.submissionDate) detailLines.push({ key: t('createProposal.submissionDate'), val: formData.submissionDate });
+  if (proposalContext.industry) detailLines.push({ key: t('createProposal.industry'), val: proposalContext.industry });
+  if (proposalContext.serviceSegment?.length) detailLines.push({ key: t('createProposal.service'), val: proposalContext.serviceSegment.join(', ') });
+  if (proposalContext.internalExternal) detailLines.push({ key: t('createProposal.internalExternal'), val: proposalContext.internalExternal });
+  if (proposalContext.submissionDate) detailLines.push({ key: t('createProposal.submissionDate'), val: proposalContext.submissionDate });
 
   const planButtonLabel = useMemo(() => {
     if (!agentPlan) return '';
@@ -728,9 +624,11 @@ export default function ProposalCreation() {
       name: file.name,
       type: inferDocType(file.name, file.type),
       source: 'User',
+      status: 'Uploaded',
     }));
+    const usingFetched = fetchedDocuments.length > 0;
     const usingUploads = uploadedDocuments.length > 0;
-    const allDocuments = usingUploads ? uploadedDocuments : demoDocuments;
+    const allDocuments = usingFetched ? fetchedDocuments : usingUploads ? uploadedDocuments : demoDocuments;
 
     const menuOptions = [
       { id: 'preview', labelKey: 'docMenuPreview', Icon: DocMenuIconEye },
@@ -756,7 +654,13 @@ export default function ProposalCreation() {
     if (allDocuments.length === 0) {
       return (
         <div className="pcr-doctab pcr-doctab--empty">
+          {isFilesListLoading ? (
+            <p className="pcr-doctab-empty-title">Loading files...</p>
+          ) : filesListError ? (
+            <p className="pcr-doctab-empty-title">{filesListError}</p>
+          ) : (
           <p className="pcr-doctab-empty-title">{t('proposalCreation.docEmptyTitle')}</p>
+          )}
           <p className="pcr-doctab-empty-hint">{t('proposalCreation.docEmptyHint')}</p>
         </div>
       );
@@ -770,6 +674,26 @@ export default function ProposalCreation() {
           </div>
           <div className="pcr-doctab-col-source pcr-doctab-col-source--head">
             <span>User/System</span>
+          </div>
+          <div className="pcr-doctab-col-status pcr-doctab-col-status--head">
+            <span>Status</span>
+          </div>
+          <div className="pcr-doctab-col-actions pcr-doctab-col-actions--head">
+            <button
+              type="button"
+              className="pcr-doctab-refresh"
+              onClick={(e) => {
+                e.stopPropagation();
+                loadFilesList();
+              }}
+              aria-label="Refresh files"
+              disabled={isFilesListLoading}
+            >
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="M16.8 9.2a6.8 6.8 0 10.7 3" stroke="#1D1D1F" strokeWidth="1.4" strokeLinecap="round" />
+                <path d="M17 4.5v4h-4" stroke="#1D1D1F" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
           </div>
         </div>
 
@@ -785,10 +709,15 @@ export default function ProposalCreation() {
             >
               <div className="pcr-doctab-col-name">
                 <div className={`pcr-doctab-icon pcr-doctab-icon-${iconVariant}`} aria-hidden="true" />
-                <span className="pcr-doctab-filename">{doc.name}</span>
+                <span className="pcr-doctab-filename" title={doc.name}>{doc.name}</span>
               </div>
               <div className="pcr-doctab-col-source">
                 <span className="pcr-doctab-source">{doc.source}</span>
+              </div>
+              <div className="pcr-doctab-col-status">
+                <span className="pcr-doctab-status">{doc.status || '-'}</span>
+              </div>
+              <div className="pcr-doctab-col-actions">
                 <div
                   ref={documentsMenuOpenId === doc.id ? documentsMenuRef : null}
                   className="pcr-doctab-more-wrap"
@@ -855,7 +784,7 @@ export default function ProposalCreation() {
           >
             <InternalEnterpriseSearch
               embedded
-              proposalState={formData}
+              proposalState={proposalContext}
               onCloseDrawer={() => setEnterpriseSearchDrawerOpen(false)}
               onReferenceSelect={handleEnterpriseReferenceSelect}
             />
@@ -968,7 +897,7 @@ export default function ProposalCreation() {
                 </div>
               )}
 
-              {enterpriseReference && showEnterpriseReference && (
+              {messages.length > 0 && enterpriseReference && showEnterpriseReference && (
                 <>
                   <div className="pcr-ai-message">
                     <div className="pcr-ai-avatar">
@@ -1018,45 +947,13 @@ export default function ProposalCreation() {
               )}
 
               {/* Proposal details summary bubble */}
-              {detailLines.length > 0 && (
+              {messages.length > 0 && detailLines.length > 0 && (
                 <div className="pcr-details-bubble">
                   {detailLines.map((line, i) => (
                     <p key={i} className="pcr-detail-line">
                       <span className="pcr-detail-key">{line.key}: </span>
                       <span className="pcr-detail-val">{line.val}</span>
                     </p>
-                  ))}
-                </div>
-              )}
-
-              {/* Initial AI message */}
-              <div className="pcr-ai-message">
-                <div className="pcr-ai-avatar">
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                    <path d="M10 2l1.5 3.5L15 7l-3.5 1.5L10 12l-1.5-3.5L5 7l3.5-1.5L10 2z" fill="#2189FF" />
-                    <path d="M15 12l1 2 2 1-2 1-1 2-1-2-2-1 2-1 1-2z" fill="#2189FF" />
-                    <path d="M4 14l.75 1.5L6 16.25l-1.25.75L4 18.5l-.75-1.5L2 16.25l1.25-.75L4 14z" fill="#2189FF" />
-                  </svg>
-                </div>
-                <div className="pcr-ai-text">
-                  <p>{t('proposalCreation.aiGreeting', { name: 'Kim' })}</p>
-                  <p>{t('proposalCreation.aiQuestion')}</p>
-                </div>
-              </div>
-
-              {/* Quick action chips */}
-              {showQuickActions && (
-                <div className="pcr-quick-actions">
-                  {quickActions.map((action) => (
-                    <button
-                      key={action}
-                      type="button"
-                      className="pcr-quick-btn"
-                      disabled={!isSocketConnected}
-                      onClick={() => handleQuickAction(action)}
-                    >
-                      {action}
-                    </button>
                   ))}
                 </div>
               )}
@@ -1098,9 +995,11 @@ export default function ProposalCreation() {
                       </svg>
                     </div>
                     <div className="pcr-ai-text">
-                      {msg.text.split('\n').map((line) => (
-                        <p key={line}>{line}</p>
-                      ))}
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: marked.parse(String(msg.text || '')),
+                        }}
+                      />
                     </div>
                   </div>
                 );
@@ -1121,28 +1020,6 @@ export default function ProposalCreation() {
                       <span /><span /><span />
                     </div>
                   </div>
-                </div>
-              )}
-
-              {/* Yes / No action buttons */}
-              {showYesNo && !aiTyping && (
-                <div className="pcr-yesno-actions">
-                  <button
-                    type="button"
-                    className="pcr-yesno-btn pcr-yesno-yes"
-                    disabled={!isSocketConnected}
-                    onClick={() => handleYesNo('Yes')}
-                  >
-                    {t('proposalCreation.yes')}
-                  </button>
-                  <button
-                    type="button"
-                    className="pcr-yesno-btn pcr-yesno-no"
-                    disabled={!isSocketConnected}
-                    onClick={() => handleYesNo('No')}
-                  >
-                    {t('proposalCreation.no')}
-                  </button>
                 </div>
               )}
 

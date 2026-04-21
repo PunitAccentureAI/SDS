@@ -1,5 +1,4 @@
 import { API_BASE_URL } from "../api";
-import { getAccessToken } from "./authService";
 import { getStoredUser } from "./authService";
 
 const SOCKET_BASE_URL =
@@ -127,8 +126,7 @@ function normalizeIncomingPayload(rawPayload) {
   };
 }
 
-export const createProposalChatSocket = ({ clientName, sessionId } = {}) => {
-  const token = getAccessToken();
+export const createProposalChatSocket = ({ clientName, fileType, sessionId } = {}) => {
   const user = getStoredUser();
   const userId = Number(user?.user_id ?? user?.id ?? user?._id ?? 0);
   let messageId = 0;
@@ -196,14 +194,21 @@ export const createProposalChatSocket = ({ clientName, sessionId } = {}) => {
     if (!ws || ws.readyState !== WebSocket.OPEN) return;
 
     if (eventName === PROPOSAL_CHAT_SOCKET_EVENTS.SEND_MESSAGE) {
-      messageId += 1;
-      const messagePayload = {
-        user_id: userId,
-        type: "input_prompt",
-        input: payload?.message || "",
-        client_name: payload?.clientName || clientName || "",
-        message_id: messageId,
-      };
+      const messageType = payload?.messageType || "user_input";
+      const messagePayload =
+        messageType === "hil_input"
+          ? {
+              type: "hil_input",
+              input: payload?.message || "",
+            }
+          : {
+              user_id: userId,
+              type: "user_input",
+              input: payload?.message || "",
+              client_name: payload?.clientName || clientName || "",
+              message_id: ++messageId,
+              file_type: payload?.fileType || fileType || "",
+            };
       ws.send(JSON.stringify(messagePayload));
       return;
     }

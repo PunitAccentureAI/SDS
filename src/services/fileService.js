@@ -45,3 +45,18 @@ export const fetchFileById = async (fileId, config = {}) => {
   const response = await apiClient.get(`/file/${fileId}`, config);
   return response.data;
 };
+
+export const fetchFilesList = async ({ user_id, session_id } = {}) => {
+  if (!user_id && user_id !== 0) {
+    throw new Error('user_id is required');
+  }
+  if (!session_id) {
+    throw new Error('session_id is required');
+  }
+
+  const response = await apiClient.post('/fetch-files-list', {
+    user_id,
+    session_id,
+  });
+  return response.data;
+};
