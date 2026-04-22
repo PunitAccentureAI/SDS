@@ -159,6 +159,107 @@
   white-space: nowrap;
 }
 
+.pcr-chat-upload-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 225;
+  background: rgba(17, 24, 39, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.pcr-chat-upload-modal {
+  width: min(520px, 100%);
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+}
+
+.pcr-chat-upload-modal h3 {
+  margin: 0 0 16px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1d1d1f;
+}
+
+.pcr-chat-upload-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.pcr-chat-upload-field label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1d1d1f;
+}
+
+.pcr-chat-upload-field select,
+.pcr-chat-upload-field input[type="file"] {
+  border: 1px solid #d5d8de;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: #1d1d1f;
+  background: #ffffff;
+}
+
+.pcr-chat-upload-file-name {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+
+.pcr-chat-upload-note {
+  margin: 0;
+  font-size: 12px;
+  color: #6f7785;
+}
+
+.pcr-chat-upload-error {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: #c22b3f;
+}
+
+.pcr-chat-upload-actions {
+  margin-top: 18px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.pcr-chat-upload-btn {
+  border: none;
+  border-radius: 999px;
+  min-width: 96px;
+  height: 38px;
+  padding: 0 16px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pcr-chat-upload-btn-secondary {
+  background: #f4f5f7;
+  color: #1d1d1f;
+}
+
+.pcr-chat-upload-btn-primary {
+  background: #1d1d1f;
+  color: #ffffff;
+}
+
+.pcr-chat-upload-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 /* ───── Nav Bar ───── */
 .pcr-nav {
   display: flex;
@@ -219,6 +320,23 @@
   background-color: #f4f5f7;
 }
 
+.pcr-nav-search-btn:disabled {
+  border-color: #cfd4dd;
+  color: #9fa8b8;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+.pcr-nav-search-btn:disabled svg,
+.pcr-nav-search-btn:disabled svg * {
+  stroke: #9fa8b8;
+  fill: #9fa8b8;
+}
+
+.pcr-nav-search-btn:disabled:hover {
+  background-color: transparent;
+}
+
 .pcr-nav-close-btn {
   display: flex;
   align-items: center;
@@ -265,7 +383,8 @@
 /* ───── Tabs ───── */
 .pcr-tabs {
   display: flex;
-  gap: 24px;
+  justify-content: space-around;
+  align-items: center;
   padding: 24px 24px 0 24px;
   border-bottom: 1px solid #e8e9ee;
   flex-shrink: 0;
@@ -274,7 +393,7 @@
 .pcr-tab {
   background: none;
   border: none;
-  padding: 0 0 16px 0;
+  padding: 0 4px 16px 4px;
   font-size: 18px;
   font-weight: 700;
   color: #9fa8b8;
@@ -516,7 +635,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  width: 132px;
+  width: 100px;
   flex-shrink: 0;
   padding: 14px 16px;
   box-sizing: border-box;
@@ -529,7 +648,7 @@
 .pcr-doctab-col-status {
   display: flex;
   align-items: center;
-  width: 120px;
+  width: 72px;
   flex-shrink: 0;
   padding: 14px 16px;
   box-sizing: border-box;
@@ -672,6 +791,12 @@
   line-height: 1;
   cursor: pointer;
   border-radius: 8px;
+}
+
+.pcr-doctab-menu-item {
+  color: #9fa8b8;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 .pcr-doctab-menu-item-label {
@@ -1174,6 +1299,38 @@
   color: #313131;
   font-size: 14px;
   line-height: 1.8;
+}
+
+.pcr-doc-agent-output {
+  font-size: 14px;
+  line-height: 1.8;
+  color: #1d1d1f;
+}
+
+.pcr-doc-agent-output p {
+  margin: 0 0 12px;
+}
+
+.pcr-doc-agent-output h1,
+.pcr-doc-agent-output h2,
+.pcr-doc-agent-output h3,
+.pcr-doc-agent-output h4 {
+  margin: 24px 0 12px;
+  line-height: 1.35;
+}
+
+.pcr-doc-agent-output table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+}
+
+.pcr-doc-agent-output th,
+.pcr-doc-agent-output td {
+  border: 1px solid #dddddd;
+  padding: 10px 12px;
+  vertical-align: top;
+  text-align: left;
 }
 
 .pcr-table {

@@ -44,6 +44,9 @@ const fallbackSegmentOptions = [
   "RPA",
 ];
 const typeOptions = ["Internal", "External"];
+const MAX_FILE_SIZE_MB = 300;
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+const ALLOWED_FILE_EXTENSIONS = new Set(["pdf", "ppt", "docx", "xlsx", "csv", "txt"]);
 
 function CustomSelect({
   label,
@@ -319,20 +322,12 @@ export default function CreateProposalDrawer({ show, onClose }) {
   const navigate = useNavigate();
   const fileTypeOptions = [
     { key: "rfp", label: t("createProposal.fileTypeOptions.rfp") },
-    {
-      key: "requirementAnalysis",
-      label: t("createProposal.fileTypeOptions.requirementAnalysis"),
-    },
-    {
-      key: "competitiveAnalysis",
-      label: t("createProposal.fileTypeOptions.competitiveAnalysis"),
-    },
   ];
   const [formData, setFormData] = useState({
     proposalName: "",
     opportunityId: "",
     clientName: "",
-    fileType: "",
+    fileType: "rfp",
     industry: "",
     serviceSegment: [],
     internalExternal: "",
@@ -433,6 +428,17 @@ export default function CreateProposalDrawer({ show, onClose }) {
 
   const processFile = (file) => {
     if (!file) return;
+    const extension = file.name?.split(".").pop()?.toLowerCase() || "";
+
+    if (!ALLOWED_FILE_EXTENSIONS.has(extension)) {
+      setUploadError("Only pdf, ppt, docx, xlsx, csv, and txt files are allowed.");
+      return;
+    }
+
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      setUploadError(`File size must be ${MAX_FILE_SIZE_MB} MB or less.`);
+      return;
+    }
 
     setCreateProposalError("");
     setUploadError("");
@@ -624,11 +630,15 @@ export default function CreateProposalDrawer({ show, onClose }) {
         fileId,
         uploadedFile: null,
       };
+      const navigationState = {
+        ...proposalState,
+        justCreated: true,
+      };
 
       cacheProposalDetails(sessionId, proposalState);
 
       navigate(`/proposal/new/${encodeURIComponent(sessionId)}`, {
-        state: proposalState,
+        state: navigationState,
       });
       onClose();
     } catch (error) {
@@ -735,7 +745,7 @@ export default function CreateProposalDrawer({ show, onClose }) {
               <input
                 ref={fileInputRef}
                 type="file"
-                accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx"
+                accept=".pdf,.ppt,.docx,.xlsx,.csv,.txt"
                 multiple={false}
                 onChange={handleFileSelect}
                 hidden

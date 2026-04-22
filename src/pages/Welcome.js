@@ -6,19 +6,6 @@ import SideNav from '../components/layout/SideNav';
 import LanguageSwitcher from '../components/ui/LanguageSwitcher';
 import './Welcome.css';
 
-const sdsLogo = 'https://www.figma.com/api/mcp/asset/22a2d86d-58e6-445b-b9b2-7540015eb78c';
-const thumbDoc = 'https://www.figma.com/api/mcp/asset/258c3536-14d7-4346-b2a8-6ca4f9cf4249';
-
-const recentProposals = [
-  {
-    id: 1,
-    name: 'Wooribank Proposal',
-    client: 'Wooribank',
-    updated: 'Updated yesterday',
-    thumb: thumbDoc,
-  },
-];
-
 function getGreetingKey() {
   const hour = new Date().getHours();
   if (hour < 12) return 'goodMorning';
@@ -31,6 +18,7 @@ export default function Welcome() {
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [sidenavOpen, setSidenavOpen] = useState(false);
+  const proposals = [];
 
   return (
     <div className="welcome-layout">
@@ -67,7 +55,7 @@ export default function Welcome() {
                 </svg>
               </button>
             )}
-            <img src={sdsLogo} alt="Samsung SDS" className="welcome-logo" />
+            <span className="welcome-logo">{t('brand.samsungSds')}</span>
           </div>
 
           <div className="welcome-header-right">
@@ -93,36 +81,20 @@ export default function Welcome() {
             <span>{t('home.createNew')}</span>
           </button>
 
-          {recentProposals.length > 0 && (
-            <section className="welcome-recents">
-              <h2 className="welcome-recents-title">{t('welcome.recents')}</h2>
-
-              <div className="welcome-recents-grid">
-                {recentProposals.map((proposal) => (
-                  <div
-                    key={proposal.id}
-                    className="welcome-card"
-                    onClick={() => navigate(`/proposal/${proposal.id}`)}
-                    role="button"
-                    tabIndex={0}
-                  >
-                    <div className="welcome-card-thumb">
-                      {proposal.thumb ? (
-                        <img src={proposal.thumb} alt={proposal.name} />
-                      ) : (
-                        <div className="welcome-card-thumb-empty" />
-                      )}
-                    </div>
-                    <div className="welcome-card-info">
-                      <h3 className="welcome-card-name">{proposal.name}</h3>
-                      <p className="welcome-card-client">{proposal.client}</p>
-                      <p className="welcome-card-updated">{proposal.updated}</p>
-                    </div>
-                  </div>
-                ))}
+          {proposals.length === 0 ? (
+            <section className="welcome-empty-state" aria-live="polite">
+              <div className="welcome-empty-card">
+                <div className="welcome-empty-icon" aria-hidden="true">
+                  <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+                    <path d="M10 6h16l8 8v24H10V6z" stroke="#B7BCC7" strokeWidth="1.8" strokeLinejoin="round" strokeDasharray="3 3" />
+                    <path d="M26 6v8h8" stroke="#B7BCC7" strokeWidth="1.8" strokeLinejoin="round" strokeDasharray="3 3" />
+                  </svg>
+                </div>
+                <p className="welcome-empty-title">{t('home.noProposals')}</p>
               </div>
             </section>
-          )}
+          ) : null}
+
         </main>
 
         <CreateProposalDrawer

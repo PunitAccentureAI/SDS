@@ -25,6 +25,10 @@ import {
 } from './proposalCreation/icons';
 import './ProposalCreation.css';
 
+const MAX_CHAT_UPLOAD_MB = 300;
+const MAX_CHAT_UPLOAD_BYTES = MAX_CHAT_UPLOAD_MB * 1024 * 1024;
+const ALLOWED_CHAT_UPLOAD_EXTENSIONS = new Set(['pdf', 'ppt', 'docx', 'xlsx', 'csv', 'txt']);
+
 export default function ProposalCreation() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -33,12 +37,12 @@ export default function ProposalCreation() {
   const [searchParams] = useSearchParams();
   const formData = location.state || {};
   const chatEndRef = useRef(null);
-  const chatFileInputRef = useRef(null);
   const chatSocketRef = useRef(null);
   const isSocketConnectedRef = useRef(false);
 
   const sessionIdFromUrl = searchParams.get('sessionId') || '';
   const sessionId = formData.sessionId || sessionIdFromPath || sessionIdFromUrl;
+  const showCreationToast = Boolean(formData?.justCreated && formData?.sessionId);
   const { proposalContext, isProposalDetailsLoading } = useProposalDetails({ sessionId, formData });
   const proposalName = proposalContext.proposalName || 'Untitled Proposal';
   const clientName = proposalContext.clientName || '';
@@ -47,13 +51,14 @@ export default function ProposalCreation() {
   const initialEnterpriseReference = proposalContext.enterpriseReference || null;
 
   const [activeTab, setActiveTab] = useState('ai-chat');
-  const [toastVisible, setToastVisible] = useState(true);
+  const [toastVisible, setToastVisible] = useState(showCreationToast);
   const [replyText, setReplyText] = useState('');
   const [messages, setMessages] = useState([]);
   const [aiTyping, setAiTyping] = useState(false);
   const [flowState, setFlowState] = useState('initial');
   const [supportFiles, setSupportFiles] = useState([]);
   const [agentPlan, setAgentPlan] = useState(null);
+  const [agentOutputContent, setAgentOutputContent] = useState('');
   const [documentStatus, setDocumentStatus] = useState('blank');
   const [demoDocuments, setDemoDocuments] = useState(() => documentTabFiles.map((d) => ({ ...d })));
   const [fetchedDocuments, setFetchedDocuments] = useState([]);
@@ -70,11 +75,16 @@ export default function ProposalCreation() {
   const [isSocketConnected, setIsSocketConnected] = useState(false);
   const [showSocketIssuePopup, setShowSocketIssuePopup] = useState(false);
   const [chatModePopupMessage, setChatModePopupMessage] = useState('');
+  const [showChatUploadModal, setShowChatUploadModal] = useState(false);
+  const [modalUploadFileType, setModalUploadFileType] = useState('rfp');
+  const [modalUploadFile, setModalUploadFile] = useState(null);
+  const [modalUploadError, setModalUploadError] = useState('');
   const [lastSocketOutputType, setLastSocketOutputType] = useState('');
   const uploadFileMutation = useUploadFileMutation();
 
   const previewTitle = `${proposalName === 'Untitled Proposal' ? 'Wooribank' : proposalName} Requirements Analysis`;
   const canShowPromptField = true;
+  const isEnterpriseSearchDisabled = true;
   const isUploadingSupportFile = uploadFileMutation.isPending;
   const currentUser = getStoredUser();
   const userId = Number(currentUser?.user_id ?? currentUser?.id ?? currentUser?._id ?? 20);
@@ -163,6 +173,11 @@ export default function ProposalCreation() {
         setLastSocketOutputType(socketMessageType);
       }
       setAiTyping(false);
+      if (socketMessageType === 'agent_output') {
+        setAgentOutputContent(String(text));
+        setDocumentStatus('ready');
+        return;
+      }
       setMessages((prev) => [...prev, { role: 'ai', text }]);
     };
 
@@ -340,11 +355,45 @@ export default function ProposalCreation() {
     };
   };
 
-  const attachSupportFile = async (file) => {
+  const validateSupportFile = (file) => {
+    if (!file) return 'File is required.';
+    const extension = file.name?.split('.').pop()?.toLowerCase() || '';
+    if (!ALLOWED_CHAT_UPLOAD_EXTENSIONS.has(extension)) {
+      return 'Only pdf, ppt, docx, xlsx, csv, and txt files are allowed.';
+    }
+    if (file.size > MAX_CHAT_UPLOAD_BYTES) {
+      return `File size must be ${MAX_CHAT_UPLOAD_MB} MB or less.`;
+    }
+    return '';
+  };
+
+  const resetChatUploadModal = () => {
+    setModalUploadFileType('rfp');
+    setModalUploadFile(null);
+    setModalUploadError('');
+  };
+
+  const openChatUploadModal = () => {
+    if (replyText.trim()) {
+      setChatModePopupMessage('Clear your typed message before uploading a file.');
+      return;
+    }
+    resetChatUploadModal();
+    setShowChatUploadModal(true);
+  };
+
+  const closeChatUploadModal = () => {
+    setShowChatUploadModal(false);
+    resetChatUploadModal();
+  };
+
+  const attachSupportFile = async (file, selectedFileType = 'rfp') => {
     if (!file) return;
     if (!sessionId) {
       throw new Error('Session ID is required before uploading a file.');
     }
+    const validationError = validateSupportFile(file);
+    if (validationError) throw new Error(validationError);
 
     const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
     const ext = inferDocType(file.name);
@@ -353,7 +402,7 @@ export default function ProposalCreation() {
       extraFields: {
         user_id: String(userId),
         client_name: clientName,
-        file_type: fileType,
+        file_type: selectedFileType || fileType || 'rfp',
         session_id: sessionId,
       },
       isTest: false,
@@ -381,30 +430,36 @@ export default function ProposalCreation() {
     });
   };
 
-  const handleChatFileSelect = async (e) => {
-    if (replyText.trim()) {
-      setChatModePopupMessage('Clear your typed message before uploading a file.');
-      e.target.value = '';
-      return;
-    }
+  const handleModalFilePick = (e) => {
     if (e.target.files && e.target.files.length > 1) {
-      setMessages((prev) => [
-        ...prev,
-        { role: 'ai', text: t('createProposal.singleFileOnly') },
-      ]);
+      setModalUploadError(t('createProposal.singleFileOnly'));
       e.target.value = '';
       return;
     }
     const file = e.target.files?.[0];
     if (!file) return;
+    const validationError = validateSupportFile(file);
+    if (validationError) {
+      setModalUploadFile(null);
+      setModalUploadError(validationError);
+      e.target.value = '';
+      return;
+    }
+    setModalUploadFile(file);
+    setModalUploadError('');
     e.target.value = '';
+  };
+
+  const handleModalUploadConfirm = async () => {
+    if (!modalUploadFile) {
+      setModalUploadError('Please select a file.');
+      return;
+    }
     try {
-      await attachSupportFile(file);
+      await attachSupportFile(modalUploadFile, modalUploadFileType);
+      closeChatUploadModal();
     } catch (error) {
-      setMessages((prev) => [
-        ...prev,
-        { role: 'ai', text: error.message || 'Failed to upload file. Please try again.' },
-      ]);
+      setModalUploadError(error?.message || 'Failed to upload file. Please try again.');
     }
   };
 
@@ -439,6 +494,11 @@ export default function ProposalCreation() {
     }
     const file = dropped[0];
     if (!file) return;
+    const validationError = validateSupportFile(file);
+    if (validationError) {
+      setMessages((prev) => [...prev, { role: 'ai', text: validationError }]);
+      return;
+    }
     if (replyText.trim()) {
       setChatModePopupMessage('Clear your typed message before uploading a file.');
       return;
@@ -456,7 +516,6 @@ export default function ProposalCreation() {
 
   const tabs = [
     { id: 'ai-chat', label: t('proposal.aiChat') },
-    { id: 'outline', label: t('proposal.outline') },
     { id: 'documents', label: t('proposal.documents') },
   ];
 
@@ -526,6 +585,23 @@ export default function ProposalCreation() {
               <div className="pcr-skeleton-line pcr-skeleton-line-short" />
             </section>
           ))}
+        </div>
+      );
+    }
+
+    if (agentOutputContent) {
+      return (
+        <div className="pcr-doc">
+          <div className="pcr-doc-header">
+            <h1 className="pcr-doc-title">{previewTitle}</h1>
+            <div className="pcr-doc-divider" />
+          </div>
+          <div
+            className="pcr-doc-agent-output"
+            dangerouslySetInnerHTML={{
+              __html: marked.parse(String(agentOutputContent || '')),
+            }}
+          />
         </div>
       );
     }
@@ -871,6 +947,57 @@ export default function ProposalCreation() {
           </button>
         </div>
       )}
+      {showChatUploadModal && (
+        <div className="pcr-chat-upload-modal-backdrop" role="presentation" onClick={closeChatUploadModal}>
+          <div
+            className="pcr-chat-upload-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Upload file"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h3>Upload file</h3>
+            <div className="pcr-chat-upload-field">
+              <label htmlFor="chat-file-type">File type</label>
+              <select
+                id="chat-file-type"
+                value={modalUploadFileType}
+                onChange={(e) => setModalUploadFileType(e.target.value)}
+              >
+                <option value="rfp">{t('createProposal.fileTypeOptions.rfp')}</option>
+              </select>
+            </div>
+            <div className="pcr-chat-upload-field">
+              <label htmlFor="chat-file-input">Choose file</label>
+              <input
+                id="chat-file-input"
+                type="file"
+                accept=".pdf,.ppt,.docx,.xlsx,.csv,.txt"
+                multiple={false}
+                onChange={handleModalFilePick}
+              />
+              {modalUploadFile ? (
+                <p className="pcr-chat-upload-file-name">{modalUploadFile.name}</p>
+              ) : null}
+              <p className="pcr-chat-upload-note">Allowed: pdf, ppt, docx, xlsx, csv, txt. Max 300MB.</p>
+            </div>
+            {modalUploadError ? <p className="pcr-chat-upload-error">{modalUploadError}</p> : null}
+            <div className="pcr-chat-upload-actions">
+              <button type="button" className="pcr-chat-upload-btn pcr-chat-upload-btn-secondary" onClick={closeChatUploadModal}>
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="pcr-chat-upload-btn pcr-chat-upload-btn-primary"
+                onClick={handleModalUploadConfirm}
+                disabled={isUploadingSupportFile}
+              >
+                Upload
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <header className="pcr-nav">
         <div className="pcr-nav-left">
@@ -880,7 +1007,13 @@ export default function ProposalCreation() {
           </span>
         </div>
         <div className="pcr-nav-right">
-          <button type="button" className="pcr-nav-search-btn" onClick={handleOpenEnterpriseSearch}>
+          <button
+            type="button"
+            className="pcr-nav-search-btn"
+            onClick={handleOpenEnterpriseSearch}
+            disabled={isEnterpriseSearchDisabled}
+            aria-disabled={isEnterpriseSearchDisabled}
+          >
             <span>{t('proposal.enterpriseSearch')}</span>
             <SparklesIcon />
           </button>
@@ -919,10 +1052,6 @@ export default function ProposalCreation() {
                 renderOutlineTab()
               ) : (
                 <>
-              <div className={`pcr-socket-status ${isSocketConnected ? 'connected' : 'disconnected'}`}>
-                <span className="pcr-socket-dot" aria-hidden="true" />
-                <span>{isSocketConnected ? 'Chat connected' : 'Chat disconnected. Reconnecting...'}</span>
-              </div>
               {/* Uploaded file chip */}
               {fileName && (
                 <div className="pcr-file-bubble">
@@ -1127,26 +1256,12 @@ export default function ProposalCreation() {
                       onKeyDown={handleKeyDown}
                     />
                     <div className="pcr-reply-actions">
-                      <input
-                        ref={chatFileInputRef}
-                        type="file"
-                        accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.csv"
-                        multiple={false}
-                        onChange={handleChatFileSelect}
-                        hidden
-                      />
                       <button
                         type="button"
                         className="pcr-reply-icon-btn"
                         aria-label="Attach"
                         disabled={isUploadingSupportFile || !isSocketConnected || aiTyping}
-                        onClick={() => {
-                          if (replyText.trim()) {
-                            setChatModePopupMessage('Clear your typed message before uploading a file.');
-                            return;
-                          }
-                          chatFileInputRef.current?.click();
-                        }}
+                        onClick={openChatUploadModal}
                       >
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                           <path d="M15.5 10.5l-5.59 5.59a4 4 0 01-5.66-5.66l5.59-5.59a2.67 2.67 0 013.77 3.77l-5.59 5.59a1.33 1.33 0 01-1.88-1.88l5.17-5.17" stroke="#09121F" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />

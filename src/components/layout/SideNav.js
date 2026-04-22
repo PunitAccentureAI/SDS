@@ -78,16 +78,26 @@ export default function SideNav({ activeItem = 'home', onNavigate, collapsed, on
 
       <nav className="sidenav-main">
         {navItemDefs.map((item) => (
+          (() => {
+            const isDisabled = item.id !== 'home';
+            return (
           <button
             key={item.id}
             type="button"
-            className={`sidenav-item ${active === item.id ? 'active' : ''}`}
-            onClick={() => handleNav(item.id)}
+            className={`sidenav-item ${active === item.id ? 'active' : ''}${isDisabled ? ' disabled' : ''}`}
+            onClick={() => {
+              if (isDisabled) return;
+              handleNav(item.id);
+            }}
+            disabled={isDisabled}
+            aria-disabled={isDisabled}
             title={collapsed ? getLabel(item) : undefined}
           >
             <span className="sidenav-item-icon">{item.icon}</span>
             {!collapsed && <span className="sidenav-item-label">{getLabel(item)}</span>}
           </button>
+            );
+          })()
         ))}
       </nav>
 
@@ -97,11 +107,11 @@ export default function SideNav({ activeItem = 'home', onNavigate, collapsed, on
         <div className="sidenav-recents">
           <div className="sidenav-recents-label">{t('nav.recents')}</div>
           {recentItems.map((item) => (
-            <button key={item} type="button" className="sidenav-recent-item">
+            <button key={item} type="button" className="sidenav-recent-item disabled" disabled aria-disabled="true">
               {item}
             </button>
           ))}
-          <button type="button" className="sidenav-see-all">
+          <button type="button" className="sidenav-see-all disabled" disabled aria-disabled="true">
             <span>{t('nav.seeAll')}</span>
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
               <path d="M8 5l5 5-5 5" stroke="#414141" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -113,13 +123,13 @@ export default function SideNav({ activeItem = 'home', onNavigate, collapsed, on
       <div className="sidenav-footer">
         <div className="sidenav-footer-border" />
         <div className="sidenav-footer-icons">
-          <button type="button" className="sidenav-footer-btn" aria-label="Settings" onClick={onSettingsClick}>
+          <button type="button" className="sidenav-footer-btn disabled" aria-label="Settings" disabled aria-disabled="true" onClick={onSettingsClick}>
             <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
               <circle cx="10" cy="10" r="3" stroke="#3a3a49" strokeWidth="1.5" />
               <path d="M10 1v2M10 17v2M1 10h2M17 10h2M3.93 3.93l1.41 1.41M14.66 14.66l1.41 1.41M3.93 16.07l1.41-1.41M14.66 5.34l1.41-1.41" stroke="#3a3a49" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
           </button>
-          <button type="button" className="sidenav-footer-btn" aria-label="Help">
+          <button type="button" className="sidenav-footer-btn disabled" aria-label="Help" disabled aria-disabled="true">
             <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
               <circle cx="10" cy="10" r="8" stroke="#3a3a49" strokeWidth="1.5" />
               <path d="M7.5 7.5a2.5 2.5 0 014.5 1.5c0 1.5-2 2-2 3.5" stroke="#3a3a49" strokeWidth="1.5" strokeLinecap="round" />
