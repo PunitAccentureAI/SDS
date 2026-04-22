@@ -364,7 +364,7 @@ export default function InternalEnterpriseSearch({
           onSettingsClick={() => navigate('/settings')}
           onNavigate={(navId) => {
             if (navId === 'home') navigate('/');
-            if (navId === 'proposals') navigate('/testhome');
+            if (navId === 'proposals') navigate('/');
             if (navId === 'enterprise-search') navigate('/internal-enterprise-search');
           }}
         />

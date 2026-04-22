@@ -19,7 +19,7 @@ export default function Settings() {
           onToggleCollapse={() => setSidenavOpen(false)}
           onProfileClick={() => navigate('/profile')}
           onNavigate={(id) => {
-            if (id === 'home') navigate('/testhome');
+            if (id === 'home') navigate('/');
             if (id === 'enterprise-search') navigate('/internal-enterprise-search');
           }}
         />

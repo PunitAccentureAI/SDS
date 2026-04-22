@@ -105,7 +105,7 @@ export default function ProposalBuilder() {
   const proposal = sampleProposalData[id] || defaultProposal;
 
   const handleSaveClose = () => {
-    navigate('/testhome');
+    navigate('/');
   };
 
   return (

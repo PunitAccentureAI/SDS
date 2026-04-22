@@ -42,7 +42,7 @@ export default function Profile() {
           onProfileClick={() => navigate('/profile')}
           onSettingsClick={() => navigate('/settings')}
           onNavigate={(id) => {
-            if (id === 'home') navigate('/testhome');
+            if (id === 'home') navigate('/');
             if (id === 'enterprise-search') navigate('/internal-enterprise-search');
           }}
         />
