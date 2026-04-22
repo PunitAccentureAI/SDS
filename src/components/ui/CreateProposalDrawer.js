@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import "./CreateProposalDrawer.css";
-import DatePicker from "./DatePicker";
 import { uploadFile } from "../../services/fileService";
 import { getStoredUser } from "../../services/authService";
 import {
@@ -331,7 +330,6 @@ export default function CreateProposalDrawer({ show, onClose }) {
     serviceSegment: [],
     internalExternal: "",
     projectGoal: "",
-    submissionDate: null,
   });
   const [uploadedFile, setUploadedFile] = useState(null);
   const [uploadError, setUploadError] = useState("");
@@ -491,8 +489,6 @@ export default function CreateProposalDrawer({ show, onClose }) {
       nextErrors.internalExternal = requiredFieldMessage;
     if (!formData.projectGoal.trim())
       nextErrors.projectGoal = requiredFieldMessage;
-    if (!formData.submissionDate)
-      nextErrors.submissionDate = requiredFieldMessage;
 
     setFormErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
@@ -570,9 +566,8 @@ export default function CreateProposalDrawer({ show, onClose }) {
     setIsSubmitting(true);
     setSubmitPhase("creating");
 
-    const dateStr = formData.submissionDate
-      ? `${String(formData.submissionDate.getMonth() + 1).padStart(2, "0")},${String(formData.submissionDate.getDate()).padStart(2, "0")},${formData.submissionDate.getFullYear()}`
-      : "";
+    const today = new Date();
+    const dateStr = `${String(today.getMonth() + 1).padStart(2, "0")},${String(today.getDate()).padStart(2, "0")},${today.getFullYear()}`;
 
     const userId = getUserId();
 
@@ -892,29 +887,6 @@ export default function CreateProposalDrawer({ show, onClose }) {
               {formErrors.projectGoal && (
                 <div className="cpd-field-error" role="alert">
                   {formErrors.projectGoal}
-                </div>
-              )}
-            </div>
-
-            <div className="cpd-field cpd-field-date">
-              <label className="cpd-label">
-                {t("createProposal.submissionDate")}
-              </label>
-              <div
-                className={formErrors.submissionDate ? "cpd-date-error" : ""}
-              >
-                <DatePicker
-                  value={formData.submissionDate}
-                  onlyToday
-                  onChange={(date) => {
-                    clearFieldError("submissionDate");
-                    setFormData({ ...formData, submissionDate: date });
-                  }}
-                />
-              </div>
-              {formErrors.submissionDate && (
-                <div className="cpd-field-error" role="alert">
-                  {formErrors.submissionDate}
                 </div>
               )}
             </div>
