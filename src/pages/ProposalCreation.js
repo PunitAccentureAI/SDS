@@ -27,7 +27,6 @@ import { inferDocType } from "../utils/proposalUtils";
 import {
   DocMenuIconEye,
   DocMenuIconDownload,
-  DocMenuIconDelete,
   SparklesIcon,
   ReplyCloseIcon,
 } from "./proposalCreation/icons";
@@ -879,6 +878,12 @@ export default function ProposalCreation() {
   );
 
   const renderDocumentsTab = () => {
+    const formatStatusLabel = (value) => {
+      const raw = String(value || "-").trim();
+      if (!raw || raw === "-") return "-";
+      return raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
+    };
+
     const uploadedDocuments = supportFiles.map((file) => ({
       id: file.id,
       name: file.name,
@@ -900,12 +905,6 @@ export default function ProposalCreation() {
         id: "download",
         labelKey: "docMenuDownload",
         Icon: DocMenuIconDownload,
-      },
-      {
-        id: "delete",
-        labelKey: "docMenuDelete",
-        Icon: DocMenuIconDelete,
-        deleteRow: true,
       },
     ];
 
@@ -1020,7 +1019,7 @@ export default function ProposalCreation() {
                 <span className="pcr-doctab-source">{doc.source}</span>
               </div>
               <div className="pcr-doctab-col-status">
-                <span className="pcr-doctab-status">{doc.status || "-"}</span>
+                <span className="pcr-doctab-status">{formatStatusLabel(doc.status)}</span>
               </div>
               <div className="pcr-doctab-col-actions">
                 <div
