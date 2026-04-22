@@ -127,6 +127,38 @@
   color: #ffffff;
 }
 
+.pcr-chat-mode-popup {
+  position: absolute;
+  top: 88px;
+  right: 24px;
+  z-index: 230;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  max-width: 460px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #1d1d1f;
+  color: #ffffff;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+}
+
+.pcr-chat-mode-popup span {
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.pcr-chat-mode-popup-close {
+  border: none;
+  background: transparent;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  white-space: nowrap;
+}
+
 /* ───── Nav Bar ───── */
 .pcr-nav {
   display: flex;

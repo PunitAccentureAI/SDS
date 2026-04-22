@@ -69,6 +69,7 @@ export default function ProposalCreation() {
   const [enterpriseSearchDrawerOpen, setEnterpriseSearchDrawerOpen] = useState(false);
   const [isSocketConnected, setIsSocketConnected] = useState(false);
   const [showSocketIssuePopup, setShowSocketIssuePopup] = useState(false);
+  const [chatModePopupMessage, setChatModePopupMessage] = useState('');
   const [lastSocketOutputType, setLastSocketOutputType] = useState('');
   const uploadFileMutation = useUploadFileMutation();
 
@@ -381,6 +382,11 @@ export default function ProposalCreation() {
   };
 
   const handleChatFileSelect = async (e) => {
+    if (replyText.trim()) {
+      setChatModePopupMessage('Clear your typed message before uploading a file.');
+      e.target.value = '';
+      return;
+    }
     if (e.target.files && e.target.files.length > 1) {
       setMessages((prev) => [
         ...prev,
@@ -433,6 +439,10 @@ export default function ProposalCreation() {
     }
     const file = dropped[0];
     if (!file) return;
+    if (replyText.trim()) {
+      setChatModePopupMessage('Clear your typed message before uploading a file.');
+      return;
+    }
 
     try {
       await attachSupportFile(file);
@@ -462,6 +472,14 @@ export default function ProposalCreation() {
     const socket = chatSocketRef.current;
     if (!socket) return;
     socket.connect();
+  };
+
+  const handleReplyInputChange = (value) => {
+    if (supportFiles.length > 0) {
+      setChatModePopupMessage('Remove the uploaded file before typing a message.');
+      return;
+    }
+    setReplyText(value);
   };
 
   const handleEnterpriseReferenceSelect = (selectedReference) => {
@@ -841,6 +859,18 @@ export default function ProposalCreation() {
           </div>
         </div>
       )}
+      {chatModePopupMessage && (
+        <div className="pcr-chat-mode-popup" role="alert">
+          <span>{chatModePopupMessage}</span>
+          <button
+            type="button"
+            className="pcr-chat-mode-popup-close"
+            onClick={() => setChatModePopupMessage('')}
+          >
+            {t('common.dismiss')}
+          </button>
+        </div>
+      )}
 
       <header className="pcr-nav">
         <div className="pcr-nav-left">
@@ -1093,7 +1123,7 @@ export default function ProposalCreation() {
                       placeholder={t('proposalCreation.replyPlaceholder')}
                       value={replyText}
                       disabled={!isSocketConnected || aiTyping}
-                      onChange={(e) => setReplyText(e.target.value)}
+                      onChange={(e) => handleReplyInputChange(e.target.value)}
                       onKeyDown={handleKeyDown}
                     />
                     <div className="pcr-reply-actions">
@@ -1110,7 +1140,13 @@ export default function ProposalCreation() {
                         className="pcr-reply-icon-btn"
                         aria-label="Attach"
                         disabled={isUploadingSupportFile || !isSocketConnected || aiTyping}
-                        onClick={() => chatFileInputRef.current?.click()}
+                        onClick={() => {
+                          if (replyText.trim()) {
+                            setChatModePopupMessage('Clear your typed message before uploading a file.');
+                            return;
+                          }
+                          chatFileInputRef.current?.click();
+                        }}
                       >
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                           <path d="M15.5 10.5l-5.59 5.59a4 4 0 01-5.66-5.66l5.59-5.59a2.67 2.67 0 013.77 3.77l-5.59 5.59a1.33 1.33 0 01-1.88-1.88l5.17-5.17" stroke="#09121F" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
