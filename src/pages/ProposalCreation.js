@@ -211,7 +211,7 @@ export default function ProposalCreation() {
       }
       setAiTyping(false);
       if (socketMessageType === "agent_output") {
-        setAgentOutputContent(String(text));
+        setAgentOutputContent((prev) => (prev ? `${prev}\n\n${String(text)}` : String(text)));
         setDocumentStatus("ready");
         return;
       }
