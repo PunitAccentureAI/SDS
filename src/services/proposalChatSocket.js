@@ -128,7 +128,7 @@ function normalizeIncomingPayload(rawPayload) {
 
 export const createProposalChatSocket = ({ clientName, fileType, sessionId } = {}) => {
   const user = getStoredUser();
-  const userId = Number(user?.user_id ?? user?.id ?? user?._id ?? 0);
+  const userId = Number(user?.user_id ?? user?.id ?? user?._id ?? 20);
   let messageId = 0;
   let ws = null;
 

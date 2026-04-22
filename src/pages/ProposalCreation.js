@@ -76,7 +76,7 @@ export default function ProposalCreation() {
   const canShowPromptField = true;
   const isUploadingSupportFile = uploadFileMutation.isPending;
   const currentUser = getStoredUser();
-  const userId = Number(currentUser?.user_id ?? currentUser?.id ?? currentUser?._id ?? 0);
+  const userId = Number(currentUser?.user_id ?? currentUser?.id ?? currentUser?._id ?? 20);
 
   const normalizeFetchedFiles = (payload) => {
     const list = Array.isArray(payload)
@@ -283,7 +283,7 @@ export default function ProposalCreation() {
     if (aiTyping) return;
     if (!replyText.trim()) return;
     const userMessage = replyText.trim();
-    const outgoingMessageType = lastSocketOutputType === 'hil_output' ? 'hil_input' : 'user_input';
+    const outgoingMessageType = lastSocketOutputType === 'hil_input' ? 'hil_input' : 'user_input';
     setMessages((prev) => [...prev, { role: 'user', text: userMessage }]);
     setReplyText('');
     const sent = emitProposalChatMessage({

@@ -547,7 +547,7 @@ export default function CreateProposalDrawer({ show, onClose }) {
 
   const getUserId = () => {
     const user = getStoredUser();
-    return String(user?.user_id ?? user?.id ?? user?._id ?? "0");
+    return String(user?.user_id ?? user?.id ?? user?._id ?? "20");
   };
 
   const handleSubmit = async (e) => {
