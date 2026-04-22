@@ -49,7 +49,7 @@
     "suffix": "to confirm access."
   },
   "home": {
-    "greeting": "{{greeting}}, {{name}}",
+    "greeting": "{{greeting}}",
     "goodMorning": "Good Morning",
     "goodAfternoon": "Good Afternoon",
     "goodEvening": "Good Evening",

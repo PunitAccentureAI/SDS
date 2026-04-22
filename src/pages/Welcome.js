@@ -66,8 +66,7 @@ export default function Welcome() {
         <main className="welcome-main">
           <h1 className="welcome-greeting">
             {t('home.greeting', {
-              greeting: t('home.' + getGreetingKey()),
-              name: 'Kim',
+              greeting: t('home.' + getGreetingKey())
             })}
           </h1>
 

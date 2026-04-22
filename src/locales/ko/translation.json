@@ -49,7 +49,7 @@
     "suffix": ""
   },
   "home": {
-    "greeting": "{{greeting}}, {{name}}",
+    "greeting": "{{greeting}}",
     "goodMorning": "좋은 아침이에요",
     "goodAfternoon": "좋은 오후에요",
     "goodEvening": "좋은 저녁이에요",
