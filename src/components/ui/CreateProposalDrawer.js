@@ -267,7 +267,7 @@ function MultiSelect({
   );
 }
 
-function FileChip({ name, size, onRemove }) {
+function FileChip({ name, onRemove }) {
   return (
     <div className="cpd-file-chip">
       <div className="cpd-file-icon">
@@ -296,7 +296,6 @@ function FileChip({ name, size, onRemove }) {
       </div>
       <div className="cpd-file-info">
         <span className="cpd-file-name">{name}</span>
-        <span className="cpd-file-meta">{size} | Uploaded</span>
       </div>
       <button
         type="button"
@@ -650,6 +649,12 @@ export default function CreateProposalDrawer({ show, onClose }) {
   };
 
   if (!show) return null;
+  const showSubmitSpinner =
+    proposalNameChecking || submitPhase === "creating" || submitPhase === "uploading";
+  const submitButtonLabel =
+    submitPhase === "creating" || submitPhase === "uploading"
+      ? t("createProposal.creatingProposal")
+      : t("createProposal.createBtn");
 
   return (
     <div className="cpd-overlay" onKeyDown={(e) => (e.key === "Escape" ? onClose() : null)}>
@@ -766,7 +771,6 @@ export default function CreateProposalDrawer({ show, onClose }) {
             {uploadedFile && (
               <FileChip
                 name={uploadedFile.name}
-                size={uploadedFile.size}
                 onRemove={handleRemoveFile}
               />
             )}
@@ -921,11 +925,8 @@ export default function CreateProposalDrawer({ show, onClose }) {
                 className="cpd-submit-btn"
                 disabled={isSubmitting || proposalNameChecking}
               >
-                {submitPhase === "uploading"
-                  ? t("createProposal.uploading")
-                  : submitPhase === "creating"
-                    ? t("createProposal.creatingProposal")
-                    : t("createProposal.createBtn")}
+                {showSubmitSpinner ? <span className="cpd-submit-spinner" aria-hidden="true" /> : null}
+                <span>{submitButtonLabel}</span>
               </button>
             </div>
           </form>
