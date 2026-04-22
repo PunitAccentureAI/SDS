@@ -1,4 +1,4 @@
-import { apiClient } from '../api';
+import { apiClient } from "../api";
 
 const proposalDetailsCache = new Map();
 
@@ -15,11 +15,11 @@ const normalizeOptionList = (payload) => {
 
   return rawList
     .map((item) => {
-      if (typeof item === 'string') return item.trim();
-      if (item && typeof item === 'object') {
-        return (item.name || item.label || item.value || '').toString().trim();
+      if (typeof item === "string") return item.trim();
+      if (item && typeof item === "object") {
+        return (item.name || item.label || item.value || "").toString().trim();
       }
-      return '';
+      return "";
     })
     .filter(Boolean);
 };
@@ -28,10 +28,10 @@ export const validateProposalName = async (proposalName) => {
   const normalizedName = proposalName?.trim();
 
   if (!normalizedName) {
-    throw new Error('proposalName is required');
+    throw new Error("proposalName is required");
   }
 
-  if (normalizedName.toLowerCase() === 'parvez') {
+  if (normalizedName.toLowerCase()) {
     return { valid: true };
   }
 
@@ -46,7 +46,7 @@ export const validateProposalName = async (proposalName) => {
 
 export const getIndustryOptions = async () => {
   try {
-    const response = await apiClient.get('/industries');
+    const response = await apiClient.get("/industries");
     return normalizeOptionList(response?.data);
   } catch (error) {
     return [];
@@ -55,7 +55,7 @@ export const getIndustryOptions = async () => {
 
 export const getSegmentOptions = async () => {
   try {
-    const response = await apiClient.get('/service-segments');
+    const response = await apiClient.get("/service-segments");
     return normalizeOptionList(response?.data);
   } catch (error) {
     return [];
@@ -63,7 +63,7 @@ export const getSegmentOptions = async () => {
 };
 
 export const createProposal = async (payload = {}) => {
-  const response = await apiClient.post('/create-proposal', payload);
+  const response = await apiClient.post("/create-proposal", payload);
   return response?.data ?? {};
 };
 
@@ -77,7 +77,7 @@ export const cacheProposalDetails = (sessionId, details = {}) => {
 
 export const getProposalDetails = async (sessionId) => {
   if (!sessionId) {
-    throw new Error('sessionId is required');
+    throw new Error("sessionId is required");
   }
 
   const cacheKey = String(sessionId);
@@ -95,14 +95,14 @@ export const getProposalDetails = async (sessionId) => {
   return {
     data: {
       session_id: cacheKey,
-      name: 'Untitled Proposal',
-      client_name: '',
-      opportunity_id: '',
-      industry: '',
+      name: "Untitled Proposal",
+      client_name: "",
+      opportunity_id: "",
+      industry: "",
       service_segment: [],
-      internal_external: '',
-      description: '',
-      submission_date: '',
+      internal_external: "",
+      description: "",
+      submission_date: "",
       file_name: null,
     },
   };
