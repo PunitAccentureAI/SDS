@@ -176,10 +176,17 @@ function MultiSelect({
     <div className="cpd-field" ref={ref}>
       <label className="cpd-label">{label}</label>
       <div className="cpd-custom-select-wrapper">
-        <button
-          type="button"
+        <div
+          role="button"
+          tabIndex={0}
           className={`cpd-multi-trigger ${open ? "open" : ""} ${selected.length > 0 ? "has-chips" : ""}${error ? " cpd-input-error" : ""}`}
           onClick={() => setOpen(!open)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              setOpen((prev) => !prev);
+            }
+          }}
           aria-expanded={open}
           aria-haspopup="listbox"
         >
@@ -225,7 +232,7 @@ function MultiSelect({
               strokeLinejoin="round"
             />
           </svg>
-        </button>
+        </div>
         {open && (
           <div className="cpd-custom-dropdown cpd-multi-dropdown" role="listbox" aria-label={label}>
             {options.map((opt) => (
