@@ -171,9 +171,17 @@
 .cpd-upload-hint {
   font-size: 14px;
   color: #757575;
-  margin: 0 0 24px 0;
+  margin: 0 0 6px 0;
   text-align: center;
   line-height: 1.7;
+}
+
+.cpd-upload-supported {
+  margin: 0 0 22px 0;
+  font-size: 12px;
+  color: #8f8f8f;
+  text-align: center;
+  line-height: 1.5;
 }
 
 .cpd-browse-btn {
@@ -199,22 +207,6 @@
   line-height: 1.4;
   font-weight: 600;
   color: #c22b3f;
-}
-
-.cpd-upload-note {
-  margin: -4px 0 0;
-  font-size: 12px;
-  line-height: 1.4;
-}
-
-.cpd-upload-note-label {
-  font-weight: 700;
-  color: #c22b3f;
-}
-
-.cpd-upload-note-types {
-  color: #0f766e;
-  font-weight: 600;
 }
 
 /* Uploading state */

@@ -1277,8 +1277,10 @@ export default function ProposalCreation() {
                 <p className="pcr-chat-upload-title">
                   {t("createProposal.uploadLabel")}
                 </p>
-                <p className="pcr-chat-upload-hint">
-                  {t("createProposal.uploadOr")}
+                <p className="pcr-chat-upload-supported">
+                  {t("createProposal.uploadAllowedTypesAndSize", {
+                    max: MAX_CHAT_UPLOAD_MB,
+                  })}
                 </p>
                 <button
                   type="button"
@@ -1293,16 +1295,6 @@ export default function ProposalCreation() {
                   {modalUploadFile.name}
                 </p>
               ) : null}
-              <p className="pcr-chat-upload-note">
-                <span className="pcr-chat-upload-note-label">
-                  {t("createProposal.uploadAllowedLabel")}
-                </span>{" "}
-                <span className="pcr-chat-upload-note-types">
-                  {t("createProposal.uploadAllowedTypesAndSize", {
-                    max: MAX_CHAT_UPLOAD_MB,
-                  })}
-                </span>
-              </p>
             </div>
             {modalUploadError ? (
               <p className="pcr-chat-upload-error">{modalUploadError}</p>
