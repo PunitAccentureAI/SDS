@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   useNavigate,
   useLocation,
@@ -57,8 +63,22 @@ export default function ProposalCreation() {
 
   const sessionIdFromUrl = searchParams.get("sessionId") || "";
   const sessionId = formData.sessionId || sessionIdFromPath || sessionIdFromUrl;
+  const creationToastHandledKey = sessionId
+    ? `pcr-proposal-created-toast:${sessionId}`
+    : "";
+  let creationToastAlreadyHandled = false;
+  if (creationToastHandledKey && typeof sessionStorage !== "undefined") {
+    try {
+      creationToastAlreadyHandled =
+        sessionStorage.getItem(creationToastHandledKey) === "1";
+    } catch {
+      creationToastAlreadyHandled = false;
+    }
+  }
   const showCreationToast = Boolean(
-    formData?.justCreated && formData?.sessionId,
+    formData?.justCreated &&
+    formData?.sessionId &&
+    !creationToastAlreadyHandled,
   );
   const { proposalContext, isProposalDetailsLoading } = useProposalDetails({
     sessionId,
@@ -169,6 +189,37 @@ export default function ProposalCreation() {
     return () => clearTimeout(timer);
   }, [toastVisible]);
 
+  // Many browsers keep `location.state` (including `justCreated`) across reload.
+  // Mark this session + replace history without `justCreated` before paint when possible.
+  useLayoutEffect(() => {
+    const state = location.state;
+    if (!state?.justCreated || !sessionId) return;
+    const { justCreated: _omitJustCreated, ...nextState } = state;
+    if (creationToastHandledKey) {
+      try {
+        sessionStorage.setItem(creationToastHandledKey, "1");
+      } catch {
+        /* private mode / quota */
+      }
+    }
+    navigate(
+      {
+        pathname: location.pathname,
+        search: location.search,
+        hash: location.hash,
+      },
+      { replace: true, state: nextState },
+    );
+  }, [
+    creationToastHandledKey,
+    location.state,
+    location.pathname,
+    location.search,
+    location.hash,
+    navigate,
+    sessionId,
+  ]);
+
   useEffect(() => {
     if (isProposalDetailsLoading) return undefined;
     const socket = createProposalChatSocket({
@@ -212,7 +263,9 @@ export default function ProposalCreation() {
       }
       setAiTyping(false);
       if (socketMessageType === "agent_output") {
-        setAgentOutputContent((prev) => (prev ? `${prev}\n\n${String(text)}` : String(text)));
+        setAgentOutputContent((prev) =>
+          prev ? `${prev}\n\n${String(text)}` : String(text),
+        );
         setDocumentStatus("ready");
         return;
       }
@@ -505,7 +558,7 @@ export default function ProposalCreation() {
     });
     const normalizedFile = normalizeUploadedFile(uploadedFile, file);
 
-    setSupportFiles([normalizedFile]);
+    //setSupportFiles([normalizedFile]);
     setMessages((prev) => {
       const withoutUserFiles = prev.filter((m) => m.role !== "user-file");
       return [
@@ -1053,7 +1106,9 @@ export default function ProposalCreation() {
                 <span className="pcr-doctab-source">{doc.source}</span>
               </div>
               <div className="pcr-doctab-col-status">
-                <span className="pcr-doctab-status">{formatStatusLabel(doc.status)}</span>
+                <span className="pcr-doctab-status">
+                  {formatStatusLabel(doc.status)}
+                </span>
               </div>
               <div className="pcr-doctab-col-actions">
                 <div
