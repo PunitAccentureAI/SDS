@@ -331,7 +331,7 @@
   color: #000000;
   background: #ffffff;
   outline: none;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
   font-family: inherit;
 }
 
@@ -340,7 +340,8 @@
 }
 
 .cpd-input:focus {
-  border-color: #1d1d1f;
+  border-color: #2189ff;
+  box-shadow: 0 0 0 2px rgba(33, 137, 255, 0.35);
 }
 
 .cpd-input-error {
@@ -348,12 +349,20 @@
 }
 
 .cpd-custom-select-trigger.cpd-input-error,
-.cpd-custom-select-trigger.cpd-input-error.open,
 .cpd-multi-trigger.cpd-input-error,
-.cpd-multi-trigger.cpd-input-error.open,
 .cpd-textarea.cpd-input-error,
 .cpd-upload-area.cpd-upload-area-error {
   border-color: #c22b3f;
+}
+
+.cpd-custom-select-trigger.cpd-input-error:focus,
+.cpd-custom-select-trigger.cpd-input-error.open,
+.cpd-multi-trigger.cpd-input-error:focus,
+.cpd-multi-trigger.cpd-input-error.open,
+.cpd-textarea.cpd-input-error:focus,
+.cpd-input.cpd-input-error:focus {
+  border-color: #c22b3f;
+  box-shadow: 0 0 0 2px rgba(194, 43, 63, 0.25);
 }
 
 .cpd-field-error {
@@ -382,11 +391,13 @@
   align-items: center;
   justify-content: space-between;
   text-align: left;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+.cpd-custom-select-trigger:focus,
 .cpd-custom-select-trigger.open {
-  border-color: #1d1d1f;
+  border-color: #2189ff;
+  box-shadow: 0 0 0 2px rgba(33, 137, 255, 0.35);
 }
 
 .cpd-select-value {
@@ -466,7 +477,7 @@
   resize: vertical;
   min-height: 90px;
   font-family: inherit;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .cpd-textarea::placeholder {
@@ -474,7 +485,8 @@
 }
 
 .cpd-textarea:focus {
-  border-color: #1d1d1f;
+  border-color: #2189ff;
+  box-shadow: 0 0 0 2px rgba(33, 137, 255, 0.35);
 }
 
 .cpd-date-error .dp-trigger,
@@ -615,11 +627,13 @@
   display: flex;
   align-items: center;
   position: relative;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+.cpd-multi-trigger:focus,
 .cpd-multi-trigger.open {
-  border-color: #1d1d1f;
+  border-color: #2189ff;
+  box-shadow: 0 0 0 2px rgba(33, 137, 255, 0.35);
 }
 
 .cpd-multi-trigger.has-chips {
@@ -682,18 +696,14 @@
   background-color: rgba(33, 137, 255, 0.15);
 }
 
-/* Visible keyboard focus for tab navigation */
+/* Visible keyboard focus for tab navigation (controls without a filled focus ring above) */
 .cpd-close-btn:focus-visible,
 .cpd-error-popup-close:focus-visible,
 .cpd-browse-btn:focus-visible,
 .cpd-file-remove:focus-visible,
-.cpd-input:focus-visible,
-.cpd-custom-select-trigger:focus-visible,
 .cpd-custom-dropdown-item:focus-visible,
-.cpd-multi-trigger:focus-visible,
 .cpd-checkbox:focus-visible + .cpd-checkbox-custom,
 .cpd-chip-remove:focus-visible,
-.cpd-textarea:focus-visible,
 .cpd-submit-btn:focus-visible {
   outline: 2px solid #2189ff;
   outline-offset: 2px;
