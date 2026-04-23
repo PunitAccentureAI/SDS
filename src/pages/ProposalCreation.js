@@ -51,6 +51,7 @@ export default function ProposalCreation() {
   const [searchParams] = useSearchParams();
   const formData = location.state || {};
   const chatEndRef = useRef(null);
+  const modalFileInputRef = useRef(null);
   const chatSocketRef = useRef(null);
   const isSocketConnectedRef = useRef(false);
 
@@ -108,6 +109,7 @@ export default function ProposalCreation() {
   const [modalUploadFileType, setModalUploadFileType] = useState("rfp");
   const [modalUploadFile, setModalUploadFile] = useState(null);
   const [modalUploadError, setModalUploadError] = useState("");
+  const [modalUploadDragOver, setModalUploadDragOver] = useState(false);
   const [lastSocketOutputType, setLastSocketOutputType] = useState("");
   const uploadFileMutation = useUploadFileMutation();
 
@@ -462,6 +464,7 @@ export default function ProposalCreation() {
     setModalUploadFileType("rfp");
     setModalUploadFile(null);
     setModalUploadError("");
+    setModalUploadDragOver(false);
   };
 
   const openChatUploadModal = () => {
@@ -525,24 +528,47 @@ export default function ProposalCreation() {
     });
   };
 
-  const handleModalFilePick = (e) => {
-    if (e.target.files && e.target.files.length > 1) {
+  const handleModalFileSelected = (fileList) => {
+    if (!fileList?.length) return;
+    if (fileList.length > 1) {
       setModalUploadError(t("createProposal.singleFileOnly"));
-      e.target.value = "";
       return;
     }
-    const file = e.target.files?.[0];
+    const file = fileList[0];
     if (!file) return;
     const validationError = validateSupportFile(file);
     if (validationError) {
       setModalUploadFile(null);
       setModalUploadError(validationError);
-      e.target.value = "";
       return;
     }
     setModalUploadFile(file);
     setModalUploadError("");
+  };
+
+  const handleModalFilePick = (e) => {
+    handleModalFileSelected(e.target.files);
     e.target.value = "";
+  };
+
+  const handleModalUploadDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setModalUploadDragOver(true);
+  };
+
+  const handleModalUploadDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.currentTarget.contains(e.relatedTarget)) return;
+    setModalUploadDragOver(false);
+  };
+
+  const handleModalUploadDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setModalUploadDragOver(false);
+    handleModalFileSelected(e.dataTransfer?.files);
   };
 
   const handleModalUploadConfirm = async () => {
@@ -1185,21 +1211,64 @@ export default function ProposalCreation() {
               </select>
             </div>
             <div className="pcr-chat-upload-field">
-              <label htmlFor="chat-file-input">Choose file</label>
+              <span className="pcr-chat-upload-field-label">File</span>
               <input
+                ref={modalFileInputRef}
                 id="chat-file-input"
                 type="file"
                 accept=".pdf,.ppt,.docx,.xlsx,.csv,.txt"
                 multiple={false}
                 onChange={handleModalFilePick}
+                hidden
               />
+              <div
+                className={`pcr-chat-upload-drop${modalUploadDragOver ? " pcr-chat-upload-drop--dragover" : ""}`}
+                onDragOver={handleModalUploadDragOver}
+                onDragLeave={handleModalUploadDragLeave}
+                onDrop={handleModalUploadDrop}
+              >
+                <div className="pcr-chat-upload-icon" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M12 16V4m0 0l-4 4m4-4l4 4"
+                      stroke="#09121F"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"
+                      stroke="#09121F"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+                <p className="pcr-chat-upload-title">
+                  {t("createProposal.uploadLabel")}
+                </p>
+                <p className="pcr-chat-upload-hint">
+                  {t("createProposal.uploadOr")}
+                </p>
+                <button
+                  type="button"
+                  className="pcr-chat-upload-browse"
+                  onClick={() => modalFileInputRef.current?.click()}
+                >
+                  {t("createProposal.browseFiles")}
+                </button>
+              </div>
               {modalUploadFile ? (
                 <p className="pcr-chat-upload-file-name">
                   {modalUploadFile.name}
                 </p>
               ) : null}
               <p className="pcr-chat-upload-note">
-                Allowed: pdf, ppt, docx, xlsx, csv, txt. Max 300MB.
+                <span className="pcr-chat-upload-note-label">Allowed:</span>{" "}
+                <span className="pcr-chat-upload-note-types">
+                  pdf, ppt, docx, xlsx, csv, txt. Max {MAX_CHAT_UPLOAD_MB}MB.
+                </span>
               </p>
             </div>
             {modalUploadError ? (
