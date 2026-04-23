@@ -107,6 +107,8 @@
     "uploading": "Uploading file",
     "creatingProposal": "Creating proposal…",
     "browseFiles": "Browse file",
+    "uploadAllowedLabel": "Allowed:",
+    "uploadAllowedTypesAndSize": "pdf, ppt, docx, xlsx, csv, txt. Max {{max}}MB.",
     "addDetails": "Add details",
     "proposalName": "Proposal Name",
     "proposalNamePlaceholder": "Type proposal name here",

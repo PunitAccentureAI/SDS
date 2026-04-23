@@ -1,5 +1,32 @@
+@font-face {
+  font-family: "SamsungOne";
+  src: url("./assets/fonts/SamsungOne/SamsungOne-400_v1.0.ttf")
+    format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SamsungOne";
+  src: url("./assets/fonts/SamsungOne/SamsungOne-700_v1.0.ttf")
+    format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Samsung Sharp Sans";
+  src: url("./assets/fonts/SamsungSharpSans-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 body {
-  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: "SamsungOne", "Samsung Sharp Sans", "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

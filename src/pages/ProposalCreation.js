@@ -23,8 +23,6 @@ import {
   PROPOSAL_CHAT_SOCKET_EVENTS,
 } from "../services/proposalChatSocket";
 import {
-  uploadedSupportFiles,
-  documentTabFiles,
   proposalOutlineSections,
   businessRequirements,
   functionalRequirements,
@@ -101,15 +99,10 @@ export default function ProposalCreation() {
   const [agentPlan, setAgentPlan] = useState(null);
   const [agentOutputContent, setAgentOutputContent] = useState("");
   const [documentStatus, setDocumentStatus] = useState("blank");
-  const [demoDocuments, setDemoDocuments] = useState(() =>
-    documentTabFiles.map((d) => ({ ...d })),
-  );
   const [fetchedDocuments, setFetchedDocuments] = useState([]);
   const [isFilesListLoading, setIsFilesListLoading] = useState(false);
   const [filesListError, setFilesListError] = useState("");
-  const [selectedDocumentId, setSelectedDocumentId] = useState(
-    documentTabFiles[1].id,
-  );
+  const [selectedDocumentId, setSelectedDocumentId] = useState(null);
   const [documentsMenuOpenId, setDocumentsMenuOpenId] = useState(null);
   const documentsMenuRef = useRef(null);
   const [outlineOpenIds, setOutlineOpenIds] = useState(
@@ -314,17 +307,15 @@ export default function ProposalCreation() {
   }, [documentsMenuOpenId]);
 
   useEffect(() => {
-    const list =
-      fetchedDocuments.length > 0
-        ? fetchedDocuments
-        : supportFiles.length > 0
-          ? supportFiles
-          : demoDocuments;
+    const list = fetchedDocuments;
     const ids = new Set(list.map((item) => item.id));
     if (list.length > 0 && !ids.has(selectedDocumentId)) {
       setSelectedDocumentId(list[0].id);
     }
-  }, [fetchedDocuments, supportFiles, demoDocuments, selectedDocumentId]);
+    if (list.length === 0 && selectedDocumentId !== null) {
+      setSelectedDocumentId(null);
+    }
+  }, [fetchedDocuments, selectedDocumentId]);
 
   useEffect(() => {
     if (
@@ -971,20 +962,7 @@ export default function ProposalCreation() {
       return raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
     };
 
-    const uploadedDocuments = supportFiles.map((file) => ({
-      id: file.id,
-      name: file.name,
-      type: inferDocType(file.name, file.type),
-      source: "User",
-      status: "Uploaded",
-    }));
-    const usingFetched = fetchedDocuments.length > 0;
-    const usingUploads = uploadedDocuments.length > 0;
-    const allDocuments = usingFetched
-      ? fetchedDocuments
-      : usingUploads
-        ? uploadedDocuments
-        : demoDocuments;
+    const allDocuments = fetchedDocuments;
 
     const menuOptions = [
       { id: "preview", labelKey: "docMenuPreview", Icon: DocMenuIconEye },
@@ -998,19 +976,7 @@ export default function ProposalCreation() {
     const handleDocMenuAction = (optionId, doc) => {
       setDocumentsMenuOpenId(null);
       if (optionId === "delete") {
-        if (usingUploads) {
-          const next = supportFiles.filter((f) => f.id !== doc.id);
-          setSupportFiles(next);
-          setSelectedDocumentId((sel) =>
-            sel === doc.id ? (next[0]?.id ?? null) : sel,
-          );
-        } else {
-          const next = demoDocuments.filter((d) => d.id !== doc.id);
-          setDemoDocuments(next);
-          setSelectedDocumentId((sel) =>
-            sel === doc.id ? (next[0]?.id ?? null) : sel,
-          );
-        }
+        // Delete action is disabled; no local fallback data to mutate.
       }
     };
 
@@ -1328,9 +1294,13 @@ export default function ProposalCreation() {
                 </p>
               ) : null}
               <p className="pcr-chat-upload-note">
-                <span className="pcr-chat-upload-note-label">Allowed:</span>{" "}
+                <span className="pcr-chat-upload-note-label">
+                  {t("createProposal.uploadAllowedLabel")}
+                </span>{" "}
                 <span className="pcr-chat-upload-note-types">
-                  pdf, ppt, docx, xlsx, csv, txt. Max {MAX_CHAT_UPLOAD_MB}MB.
+                  {t("createProposal.uploadAllowedTypesAndSize", {
+                    max: MAX_CHAT_UPLOAD_MB,
+                  })}
                 </span>
               </p>
             </div>
@@ -1551,7 +1521,7 @@ export default function ProposalCreation() {
                     )}
 
                   {/* Proposal details summary bubble */}
-                  {messages.length > 0 && detailLines.length > 0 && (
+                  {detailLines.length > 0 && (
                     <div className="pcr-details-bubble">
                       {detailLines.map((line, i) => (
                         <p key={i} className="pcr-detail-line">

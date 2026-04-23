@@ -201,6 +201,22 @@
   color: #c22b3f;
 }
 
+.cpd-upload-note {
+  margin: -4px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.cpd-upload-note-label {
+  font-weight: 700;
+  color: #c22b3f;
+}
+
+.cpd-upload-note-types {
+  color: #0f766e;
+  font-weight: 600;
+}
+
 /* Uploading state */
 .cpd-uploading-state {
   display: flex;

@@ -763,6 +763,16 @@ export default function CreateProposalDrawer({ show, onClose }) {
                 hidden
               />
             </div>
+            <p className="cpd-upload-note">
+              <span className="cpd-upload-note-label">
+                {t("createProposal.uploadAllowedLabel")}
+              </span>{" "}
+              <span className="cpd-upload-note-types">
+                {t("createProposal.uploadAllowedTypesAndSize", {
+                  max: MAX_FILE_SIZE_MB,
+                })}
+              </span>
+            </p>
 
             {uploadError && (
               <div className="cpd-upload-error" role="alert">
