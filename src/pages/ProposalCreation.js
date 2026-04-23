@@ -611,7 +611,11 @@ export default function ProposalCreation() {
     if (dropped.length > 1) {
       setMessages((prev) => [
         ...prev,
-        { role: "ai", text: t("createProposal.singleFileOnly") },
+        {
+          role: "ai",
+          text: t("createProposal.singleFileOnly"),
+          tone: "error",
+        },
       ]);
       return;
     }
@@ -619,7 +623,10 @@ export default function ProposalCreation() {
     if (!file) return;
     const validationError = validateSupportFile(file);
     if (validationError) {
-      setMessages((prev) => [...prev, { role: "ai", text: validationError }]);
+      setMessages((prev) => [
+        ...prev,
+        { role: "ai", text: validationError, tone: "error" },
+      ]);
       return;
     }
     if (replyText.trim()) {
@@ -637,6 +644,7 @@ export default function ProposalCreation() {
         {
           role: "ai",
           text: error.message || "Failed to upload file. Please try again.",
+          tone: "error",
         },
       ]);
     }
@@ -1574,7 +1582,9 @@ export default function ProposalCreation() {
                             />
                           </svg>
                         </div>
-                        <div className="pcr-ai-text">
+                        <div
+                          className={`pcr-ai-text${msg.tone === "error" ? " pcr-ai-text--error" : ""}`}
+                        >
                           <div
                             dangerouslySetInnerHTML={{
                               __html: marked.parse(String(msg.text || "")),

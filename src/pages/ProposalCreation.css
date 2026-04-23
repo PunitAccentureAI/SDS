@@ -997,6 +997,12 @@
   overflow-x: auto;
 }
 
+.pcr-ai-text--error,
+.pcr-ai-text--error p {
+  color: #c22b3f;
+  font-weight: 600;
+}
+
 .pcr-ai-text p {
   margin: 0;
 }

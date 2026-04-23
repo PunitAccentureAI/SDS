@@ -193,6 +193,14 @@
   background-color: #e0e0e0;
 }
 
+.cpd-upload-error {
+  margin-top: 12px;
+  font-size: 12px;
+  line-height: 1.4;
+  font-weight: 600;
+  color: #c22b3f;
+}
+
 /* Uploading state */
 .cpd-uploading-state {
   display: flex;
