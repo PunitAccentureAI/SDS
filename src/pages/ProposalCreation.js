@@ -1763,7 +1763,7 @@ export default function ProposalCreation() {
                         </button>
                       </div>
                     </div>
-                    {supportFiles.length > 0 && (
+                    {/* {supportFiles.length > 0 && (
                       <div className="pcr-support-files">
                         {supportFiles.map((file) => (
                           <div key={file.id} className="pcr-support-file">
@@ -1792,7 +1792,7 @@ export default function ProposalCreation() {
                           </div>
                         )}
                       </div>
-                    )}
+                    )} */}
                   </div>
                 </div>
               )}
