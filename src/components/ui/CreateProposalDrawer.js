@@ -384,6 +384,18 @@ export default function CreateProposalDrawer({ show, onClose }) {
     closeButtonRef.current?.focus();
   }, [show]);
 
+  useEffect(() => {
+    if (show) return;
+    setUploadError("");
+    setCreateProposalError("");
+    setProposalNameError("");
+    setFormErrors({});
+    setDragOver(false);
+    setProposalNameChecking(false);
+    setIsSubmitting(false);
+    setSubmitPhase("idle");
+  }, [show]);
+
   const clearFieldError = (field) => {
     setFormErrors((prev) => {
       if (!prev[field]) return prev;
