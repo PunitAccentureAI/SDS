@@ -17,7 +17,7 @@ import { marked } from "marked";
 import { useUploadFileMutation } from "../hooks/useFiles";
 import { useProposalDetails } from "../hooks/useProposalDetails";
 import { getStoredUser } from "../services/authService";
-import { fetchFilesList } from "../services/fileService";
+import { fetchDownloadFileUrl, fetchFilesList } from "../services/fileService";
 import InternalEnterpriseSearch from "./InternalEnterpriseSearch";
 import {
   createProposalChatSocket,
@@ -101,6 +101,24 @@ function isDocumentInProgressStatus(status) {
     normalized.includes("processing") ||
     normalized === "pending"
   );
+}
+
+function resolveDownloadUrlFromApiResponse(payload) {
+  const candidates = [
+    payload?.url,
+    payload?.download_url,
+    payload?.file_url,
+    payload?.link,
+    payload?.data?.url,
+    payload?.data?.download_url,
+    payload?.data?.file_url,
+    payload?.result?.url,
+  ];
+  for (const raw of candidates) {
+    const value = raw != null ? String(raw).trim() : "";
+    if (value) return value;
+  }
+  return "";
 }
 
 export default function ProposalCreation() {
@@ -357,7 +375,7 @@ export default function ProposalCreation() {
       setAiTyping(Boolean(payload?.isTyping));
     };
 
-    const handleAiMessage = (payload) => {
+    const handleAiMessage = async (payload) => {
       const socketMessageType = String(payload?.type || "").toLowerCase();
       const text = payload?.message ?? payload?.text;
       if (socketMessageType === "agent_in_progress") {
@@ -374,28 +392,48 @@ export default function ProposalCreation() {
         }
         setAiTyping(false);
         setIsAgentInProgress(false);
-        const url = extractProposalAgentDownloadUrl(payload, text);
         const textStr = text != null ? String(text).trim() : "";
-        if (!url && !textStr) return;
-        if (url) setAgentDownloadUrl(url);
         const fileName =
           payload?.file_name ??
           payload?.filename ??
           payload?.fileName ??
+          payload?.message ??
+          payload?.text ??
           payload?.data?.file_name ??
           payload?.data?.filename ??
           "";
-        setAgentDownloadFileName(fileName ? String(fileName) : "");
-        setDocumentStatus("ready");
-        if (textStr) {
-          const onlyUrlMessage =
-            Boolean(url) &&
-            (textStr === url || textStr.replace(url, "").trim() === "");
-          if (!onlyUrlMessage) {
-            setAgentOutputContent((prev) =>
-              prev ? `${prev}\n\n${textStr}` : textStr,
-            );
+        const fileTypeValue =
+          payload?.file_type ??
+          payload?.file_rtype ??
+          payload?.fileType ??
+          payload?.data?.file_type ??
+          payload?.data?.file_rtype ??
+          "";
+        if (!fileName || !fileTypeValue || !sessionId) return;
+        const fileNameStr = String(fileName).trim();
+        const fileTypeStr = String(fileTypeValue).trim();
+        if (!fileNameStr || !fileTypeStr) return;
+        try {
+          const downloadResponse = await fetchDownloadFileUrl({
+            session_id: sessionId,
+            file_name: fileNameStr,
+            file_type: fileTypeStr,
+          });
+          const url =
+            resolveDownloadUrlFromApiResponse(downloadResponse) ||
+            extractProposalAgentDownloadUrl(payload, textStr);
+          if (url) {
+            setAgentDownloadUrl(url);
+            setAgentDownloadFileName(fileNameStr);
+            setDocumentStatus("ready");
           }
+        } catch (error) {
+          // keep chat responsive even if download URL API fails
+        }
+        if (textStr) {
+          setAgentOutputContent((prev) =>
+            prev ? `${prev}\n\n${textStr}` : textStr,
+          );
         }
         return;
       }

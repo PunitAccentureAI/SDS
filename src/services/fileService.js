@@ -65,3 +65,26 @@ export const fetchFilesList = async ({
   });
   return response.data;
 };
+
+export const fetchDownloadFileUrl = async ({
+  session_id,
+  file_name,
+  file_type,
+} = {}) => {
+  if (!session_id) {
+    throw new Error("session_id is required");
+  }
+  if (!file_name) {
+    throw new Error("file_name is required");
+  }
+  if (!file_type) {
+    throw new Error("file_type is required");
+  }
+
+  const response = await apiClient.post("/download-file", {
+    session_id,
+    file_name,
+    file_type,
+  });
+  return response.data;
+};
