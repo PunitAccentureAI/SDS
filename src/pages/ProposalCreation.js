@@ -177,7 +177,9 @@ export default function ProposalCreation() {
   const [showSocketIssuePopup, setShowSocketIssuePopup] = useState(false);
   const [chatModePopupMessage, setChatModePopupMessage] = useState("");
   const [showChatUploadModal, setShowChatUploadModal] = useState(false);
-  const [modalUploadFileType, setModalUploadFileType] = useState("rfp");
+  const [modalUploadFileType, setModalUploadFileType] = useState(
+    "requirement_analysis",
+  );
   const [modalUploadFile, setModalUploadFile] = useState(null);
   const [modalUploadError, setModalUploadError] = useState("");
   const [modalUploadDragOver, setModalUploadDragOver] = useState(false);
@@ -716,7 +718,7 @@ export default function ProposalCreation() {
   };
 
   const resetChatUploadModal = () => {
-    setModalUploadFileType("rfp");
+    setModalUploadFileType("requirement_analysis");
     setModalUploadFile(null);
     setModalUploadError("");
     setModalUploadDragOver(false);
@@ -738,7 +740,10 @@ export default function ProposalCreation() {
     resetChatUploadModal();
   };
 
-  const attachSupportFile = async (file, selectedFileType = "rfp") => {
+  const attachSupportFile = async (
+    file,
+    selectedFileType = "requirement_analysis",
+  ) => {
     if (!file) return;
     if (!sessionId) {
       throw new Error("Session ID is required before uploading a file.");
@@ -753,7 +758,7 @@ export default function ProposalCreation() {
       extraFields: {
         user_id: String(userId),
         client_name: clientName,
-        file_type: selectedFileType || fileType || "rfp",
+        file_type: selectedFileType || "requirement_analysis",
         session_id: sessionId,
       },
       isTest: false,
@@ -1472,8 +1477,11 @@ export default function ProposalCreation() {
                 value={modalUploadFileType}
                 onChange={(e) => setModalUploadFileType(e.target.value)}
               >
-                <option value="rfp">
-                  {t("createProposal.fileTypeOptions.rfp")}
+                <option value="requirement_analysis">
+                  {t("createProposal.fileTypeOptions.requirementAnalysis")}
+                </option>
+                <option value="competitive_analysis">
+                  {t("createProposal.fileTypeOptions.competitiveAnalysis")}
                 </option>
               </select>
             </div>
