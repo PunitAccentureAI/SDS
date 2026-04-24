@@ -673,7 +673,7 @@ export default function ProposalCreation() {
     if (!replyText.trim()) return;
     const userMessage = replyText.trim();
     const outgoingMessageType =
-      lastSocketOutputType === "hil_input" ? "hil_input" : "user_input";
+      lastSocketOutputType === "hil_output" ? "hil_input" : "user_input";
     setMessages((prev) => [...prev, { role: "user", text: userMessage }]);
     setReplyText("");
     const sent = emitProposalChatMessage({
