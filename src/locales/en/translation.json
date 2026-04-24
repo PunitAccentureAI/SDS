@@ -215,7 +215,7 @@
     "docEmptyTitle": "No documents attached",
     "docEmptyHint": "Upload files from the AI Chat tab to see them here.",
     "fileUploadInProgress": "File ingestion is in progress, please wait.",
-    "fileUploadComplete": "File uploaded successfully.",
+    "fileUploadComplete": "File ingested successfully.",
     "outlineExpand": "Expand section",
     "outlineCollapse": "Collapse section",
     "outlineBusinessRequirements": "Business Requirements",

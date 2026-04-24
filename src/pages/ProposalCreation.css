@@ -1610,6 +1610,7 @@
   flex-wrap: wrap;
   gap: 8px;
   padding-left: 48px;
+  padding-bottom: 12px;
   margin-top: 8px;
   max-width: 420px;
 }

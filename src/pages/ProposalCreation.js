@@ -189,6 +189,9 @@ export default function ProposalCreation() {
   const [hasCompletedInitialQuickAction, setHasCompletedInitialQuickAction] =
     useState(false);
   const [selectedQuickAction, setSelectedQuickAction] = useState("");
+  const [showUploadCompleteMessage, setShowUploadCompleteMessage] =
+    useState(false);
+  const [hasLoadedFilesListOnce, setHasLoadedFilesListOnce] = useState(false);
   const uploadFileMutation = useUploadFileMutation();
 
   const previewTitle = `${proposalName === "Untitled Proposal" ? "Wooribank" : proposalName} Requirements Analysis`;
@@ -258,6 +261,7 @@ export default function ProposalCreation() {
       setFilesListError(error?.message || "Failed to load files list.");
     } finally {
       setIsFilesListLoading(false);
+      setHasLoadedFilesListOnce(true);
     }
   };
 
@@ -270,6 +274,8 @@ export default function ProposalCreation() {
     setIsAgentInProgress(false);
     setShowInitialQuickActions(false);
     setHasCompletedInitialQuickAction(false);
+    setShowUploadCompleteMessage(false);
+    setHasLoadedFilesListOnce(false);
   }, [sessionId]);
 
   useEffect(() => {
@@ -458,17 +464,26 @@ export default function ProposalCreation() {
       activeTab === "ai-chat" &&
       chatFileName
     ) {
-      setMessages((prev) => [
-        ...prev,
-        { role: "ai", text: t("proposalCreation.fileUploadComplete") },
-      ]);
+      setShowUploadCompleteMessage(true);
     }
     wasAnyDocumentInProgressRef.current = isAnyDocumentInProgress;
   }, [isAnyDocumentInProgress, activeTab, chatFileName, t]);
 
   useEffect(() => {
+    if (!showUploadCompleteMessage) return undefined;
+    const timer = setTimeout(() => {
+      setShowUploadCompleteMessage(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [showUploadCompleteMessage]);
+
+  useEffect(() => {
     if (activeTab !== "ai-chat") return;
     if (hasCompletedInitialQuickAction) return;
+    if (!hasLoadedFilesListOnce) {
+      setShowInitialQuickActions(false);
+      return;
+    }
     if (!chatFileName || isAnyDocumentInProgress || hasUserTypedMessage) {
       setShowInitialQuickActions(false);
       return;
@@ -480,6 +495,7 @@ export default function ProposalCreation() {
     isAnyDocumentInProgress,
     hasUserTypedMessage,
     hasCompletedInitialQuickAction,
+    hasLoadedFilesListOnce,
   ]);
 
   useEffect(() => {
@@ -1968,6 +1984,32 @@ export default function ProposalCreation() {
                   </div>
                   <div className="pcr-ai-text">
                     <p>{t("proposalCreation.fileUploadInProgress")}</p>
+                  </div>
+                </div>
+              )}
+
+            {showUploadCompleteMessage &&
+              activeTab !== "documents" &&
+              activeTab !== "outline" && (
+                <div className="pcr-ai-message">
+                  <div className="pcr-ai-avatar">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                      <path
+                        d="M10 2l1.5 3.5L15 7l-3.5 1.5L10 12l-1.5-3.5L5 7l3.5-1.5L10 2z"
+                        fill="#2189FF"
+                      />
+                      <path
+                        d="M15 12l1 2 2 1-2 1-1 2-1-2-2-1 2-1 1-2z"
+                        fill="#2189FF"
+                      />
+                      <path
+                        d="M4 14l.75 1.5L6 16.25l-1.25.75L4 18.5l-.75-1.5L2 16.25l1.25-.75L4 14z"
+                        fill="#2189FF"
+                      />
+                    </svg>
+                  </div>
+                  <div className="pcr-ai-text">
+                    <p>{t("proposalCreation.fileUploadComplete")}</p>
                   </div>
                 </div>
               )}
