@@ -11,9 +11,12 @@ export default function NotFound() {
   return (
     <div className="nf-page">
       <header className="nf-topbar">
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: '0 24px' }}>
-          <span className="nf-logo">{t('brand.samsungSds')}</span>
-          <LanguageSwitcher />
+        <div className="nf-topbar-inner">
+          <div className="nf-topbar-spacer" aria-hidden="true" />
+          <span className="nf-logo">{t("brand.samsungSds")}</span>
+          <div className="nf-topbar-actions">
+            <LanguageSwitcher />
+          </div>
         </div>
       </header>
 
