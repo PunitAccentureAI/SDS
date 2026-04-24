@@ -488,7 +488,13 @@ export default function ProposalCreation() {
 
   useEffect(() => {
     if (!sessionId || !isAnyDocumentInProgress) return undefined;
+    let pollCount = 0;
     const timer = setInterval(() => {
+      if (pollCount >= 30) {
+        clearInterval(timer);
+        return;
+      }
+      pollCount += 1;
       loadFilesList();
     }, 5000);
     return () => clearInterval(timer);
