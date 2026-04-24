@@ -712,7 +712,7 @@ export default function ProposalCreation() {
     setHasCompletedInitialQuickAction(true);
     setMessages((prev) => [...prev, { role: "user", text: value }]);
     const outgoingMessageType =
-      lastSocketOutputType === "hil_input" ? "hil_input" : "user_input";
+      lastSocketOutputType === "hil_output" ? "hil_input" : "user_input";
     const sent = emitProposalChatMessage({
       message: value,
       type: "user_input",
