@@ -209,6 +209,8 @@
     "docMenuAria": "Document actions",
     "docMenuPreview": "Preview",
     "docMenuDownload": "Download",
+    "downloadAgentFileAria": "Download generated file",
+    "agentOutputFileReady": "Your generated file is ready.",
     "docMenuDelete": "Delete",
     "docEmptyTitle": "No documents attached",
     "docEmptyHint": "Upload files from the AI Chat tab to see them here.",

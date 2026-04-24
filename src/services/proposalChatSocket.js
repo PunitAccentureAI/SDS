@@ -126,7 +126,11 @@ function normalizeIncomingPayload(rawPayload) {
   };
 }
 
-export const createProposalChatSocket = ({ clientName, fileType, sessionId } = {}) => {
+export const createProposalChatSocket = ({
+  clientName,
+  fileType,
+  sessionId,
+} = {}) => {
   const user = getStoredUser();
   const userId = Number(user?.user_id ?? user?.id ?? user?._id ?? 20);
   let messageId = 0;
@@ -199,7 +203,10 @@ export const createProposalChatSocket = ({ clientName, fileType, sessionId } = {
         messageType === "hil_input"
           ? {
               type: "hil_input",
+              user_id: userId,
               input: payload?.message || "",
+              client_name: payload?.clientName || clientName || "",
+              message_id: ++messageId,
             }
           : {
               user_id: userId,

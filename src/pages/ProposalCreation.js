@@ -1,4 +1,5 @@
 import React, {
+  useCallback,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -46,6 +47,47 @@ const ALLOWED_CHAT_UPLOAD_EXTENSIONS = new Set([
   "csv",
   "txt",
 ]);
+
+function extractProposalAgentDownloadUrl(payload, messageText) {
+  const fromPayload = [
+    payload?.url,
+    payload?.link,
+    payload?.href,
+    payload?.download_url,
+    payload?.file_url,
+    payload?.downloadUrl,
+    payload?.fileUrl,
+    payload?.data?.url,
+    payload?.data?.link,
+    payload?.data?.download_url,
+    payload?.data?.file_url,
+  ];
+  for (const raw of fromPayload) {
+    const s = raw != null ? String(raw).trim() : "";
+    if (/^https?:\/\//i.test(s)) return s;
+  }
+  const text = messageText != null ? String(messageText) : "";
+  const m = text.match(/https?:\/\/[^\s\]"'<>]+/i);
+  if (!m) return "";
+  return m[0].replace(/[.,;)\]}>'"]+$/u, "");
+}
+
+function formatDateAsYyyyMmDd(value) {
+  if (!value) return "";
+  const str = String(value).trim();
+  if (!str) return "";
+  const direct = str.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})$/);
+  if (direct) {
+    const [, y, m, d] = direct;
+    return `${y}/${m.padStart(2, "0")}/${d.padStart(2, "0")}`;
+  }
+  const parsed = new Date(str);
+  if (Number.isNaN(parsed.getTime())) return str;
+  const y = parsed.getFullYear();
+  const m = String(parsed.getMonth() + 1).padStart(2, "0");
+  const d = String(parsed.getDate()).padStart(2, "0");
+  return `${y}/${m}/${d}`;
+}
 
 export default function ProposalCreation() {
   const { t } = useTranslation();
@@ -98,6 +140,8 @@ export default function ProposalCreation() {
   const [supportFiles, setSupportFiles] = useState([]);
   const [agentPlan, setAgentPlan] = useState(null);
   const [agentOutputContent, setAgentOutputContent] = useState("");
+  const [agentDownloadUrl, setAgentDownloadUrl] = useState("");
+  const [agentDownloadFileName, setAgentDownloadFileName] = useState("");
   const [documentStatus, setDocumentStatus] = useState("blank");
   const [fetchedDocuments, setFetchedDocuments] = useState([]);
   const [isFilesListLoading, setIsFilesListLoading] = useState(false);
@@ -135,6 +179,23 @@ export default function ProposalCreation() {
     currentUser?.user_id ?? currentUser?.id ?? currentUser?._id ?? 20,
   );
 
+  const handleAgentDownloadFileClick = useCallback(() => {
+    if (!agentDownloadUrl) return;
+    const a = document.createElement("a");
+    a.href = agentDownloadUrl;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    if (agentDownloadFileName) {
+      a.setAttribute("download", agentDownloadFileName);
+    }
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }, [agentDownloadUrl, agentDownloadFileName]);
+
+  const showAgentSocketDownload =
+    Boolean(agentDownloadUrl) && documentStatus !== "loading";
+
   const normalizeFetchedFiles = (payload) => {
     const list = Array.isArray(payload)
       ? payload
@@ -169,6 +230,14 @@ export default function ProposalCreation() {
       setIsFilesListLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!sessionId) return;
+    setAgentOutputContent("");
+    setAgentDownloadUrl("");
+    setAgentDownloadFileName("");
+    setLastSocketOutputType("");
+  }, [sessionId]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -249,8 +318,40 @@ export default function ProposalCreation() {
 
     const handleAiMessage = (payload) => {
       const socketMessageType = String(payload?.type || "").toLowerCase();
-      const text = payload?.message || payload?.text;
-      if (!text) return;
+      const text = payload?.message ?? payload?.text;
+
+      if (socketMessageType === "download_file") {
+        if (socketMessageType) {
+          setLastSocketOutputType(socketMessageType);
+        }
+        setAiTyping(false);
+        const url = extractProposalAgentDownloadUrl(payload, text);
+        const textStr = text != null ? String(text).trim() : "";
+        if (!url && !textStr) return;
+        if (url) setAgentDownloadUrl(url);
+        const fileName =
+          payload?.file_name ??
+          payload?.filename ??
+          payload?.fileName ??
+          payload?.data?.file_name ??
+          payload?.data?.filename ??
+          "";
+        setAgentDownloadFileName(fileName ? String(fileName) : "");
+        setDocumentStatus("ready");
+        if (textStr) {
+          const onlyUrlMessage =
+            Boolean(url) &&
+            (textStr === url || textStr.replace(url, "").trim() === "");
+          if (!onlyUrlMessage) {
+            setAgentOutputContent((prev) =>
+              prev ? `${prev}\n\n${textStr}` : textStr,
+            );
+          }
+        }
+        return;
+      }
+
+      if (text == null || !String(text).trim()) return;
       if (socketMessageType) {
         setLastSocketOutputType(socketMessageType);
       }
@@ -769,7 +870,7 @@ export default function ProposalCreation() {
   if (proposalContext.submissionDate)
     detailLines.push({
       key: t("createProposal.submissionDate"),
-      val: proposalContext.submissionDate,
+      val: formatDateAsYyyyMmDd(proposalContext.submissionDate),
     });
 
   const planButtonLabel = useMemo(() => {
@@ -799,15 +900,39 @@ export default function ProposalCreation() {
       );
     }
 
-    if (agentOutputContent) {
+    const hasSocketAgentPreview =
+      Boolean(String(agentOutputContent || "").trim()) ||
+      Boolean(agentDownloadUrl);
+
+    if (hasSocketAgentPreview) {
+      const outputHtml = String(agentOutputContent || "").trim();
       return (
         <div className="pcr-doc">
-          <div
-            className="pcr-doc-agent-output"
-            dangerouslySetInnerHTML={{
-              __html: marked.parse(String(agentOutputContent || "")),
-            }}
-          />
+          {outputHtml ? (
+            <div
+              className="pcr-doc-agent-output"
+              dangerouslySetInnerHTML={{
+                __html: marked.parse(outputHtml),
+              }}
+            />
+          ) : (
+            <p className="pcr-doc-agent-output pcr-doc-download-ready">
+              {t("proposalCreation.agentOutputFileReady")}
+            </p>
+          )}
+          {showAgentSocketDownload ? (
+            <div className="pcr-doc-download-actions">
+              <button
+                type="button"
+                className="pcr-preview-download pcr-preview-download--bottom"
+                onClick={handleAgentDownloadFileClick}
+                aria-label={t("proposalCreation.downloadAgentFileAria")}
+              >
+                <DocMenuIconDownload />
+                <span>{t("proposalCreation.docMenuDownload")}</span>
+              </button>
+            </div>
+          ) : null}
         </div>
       );
     }

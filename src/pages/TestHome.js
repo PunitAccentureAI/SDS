@@ -5,9 +5,9 @@ import CreateProposalDrawer from '../components/ui/CreateProposalDrawer';
 import SideNav from '../components/layout/SideNav';
 import FilterPanel, { filterGroups } from '../components/ui/FilterPanel';
 import LanguageSwitcher from '../components/ui/LanguageSwitcher';
+import sdsLogo from '../assets/images/SamsungSDS_Logo.svg';
 import './TestHome.css';
 
-const sdsLogo = 'https://www.figma.com/api/mcp/asset/22a2d86d-58e6-445b-b9b2-7540015eb78c';
 const thumbDoc = 'https://www.figma.com/api/mcp/asset/258c3536-14d7-4346-b2a8-6ca4f9cf4249';
 const thumbDeck = 'https://www.figma.com/api/mcp/asset/e0b3eb01-461a-4d4e-9598-707dffcf35b6';
 
