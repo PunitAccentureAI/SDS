@@ -1598,6 +1598,49 @@
   color: #1d1d1f;
 }
 
+.pcr-upload-wait-message {
+  margin: 8px 0 0 48px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #6f7785;
+}
+
+.pcr-quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-left: 48px;
+  margin-top: 8px;
+  max-width: 420px;
+}
+
+.pcr-quick-action-btn {
+  height: 38px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 999px;
+  background: #e8e9ee;
+  color: #5a5d6e;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+}
+
+.pcr-quick-action-btn--active {
+  background: #000000;
+  color: #ffffff;
+}
+
+.pcr-quick-action-btn:hover {
+  opacity: 0.88;
+}
+
+.pcr-quick-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* ───── AI Typing Indicator ───── */
 .pcr-typing-indicator {
   display: flex;

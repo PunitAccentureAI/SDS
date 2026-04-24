@@ -24,6 +24,7 @@ import {
   PROPOSAL_CHAT_SOCKET_EVENTS,
 } from "../services/proposalChatSocket";
 import {
+  quickActions,
   proposalOutlineSections,
   businessRequirements,
   functionalRequirements,
@@ -87,6 +88,17 @@ function formatDateAsYyyyMmDd(value) {
   const m = String(parsed.getMonth() + 1).padStart(2, "0");
   const d = String(parsed.getDate()).padStart(2, "0");
   return `${y}/${m}/${d}`;
+}
+
+function isDocumentInProgressStatus(status) {
+  const normalized = String(status || "").trim().toLowerCase();
+  if (!normalized) return false;
+  return (
+    normalized.includes("progress") ||
+    normalized.includes("uploading") ||
+    normalized.includes("processing") ||
+    normalized === "pending"
+  );
 }
 
 export default function ProposalCreation() {
@@ -168,12 +180,24 @@ export default function ProposalCreation() {
   const [modalUploadError, setModalUploadError] = useState("");
   const [modalUploadDragOver, setModalUploadDragOver] = useState(false);
   const [lastSocketOutputType, setLastSocketOutputType] = useState("");
+  const [isAgentInProgress, setIsAgentInProgress] = useState(false);
+  const [showInitialQuickActions, setShowInitialQuickActions] = useState(false);
+  const [hasCompletedInitialQuickAction, setHasCompletedInitialQuickAction] =
+    useState(false);
+  const [selectedQuickAction, setSelectedQuickAction] = useState(
+    quickActions[1] || quickActions[0] || "",
+  );
   const uploadFileMutation = useUploadFileMutation();
 
   const previewTitle = `${proposalName === "Untitled Proposal" ? "Wooribank" : proposalName} Requirements Analysis`;
   const canShowPromptField = true;
   const isEnterpriseSearchDisabled = true;
   const isUploadingSupportFile = uploadFileMutation.isPending;
+  const inProgressDocument = fetchedDocuments.find((doc) =>
+    isDocumentInProgressStatus(doc?.status),
+  );
+  const isAnyDocumentInProgress = Boolean(inProgressDocument);
+  const chatFileName = inProgressDocument?.name || fileName;
   const currentUser = getStoredUser();
   const userId = Number(
     currentUser?.user_id ?? currentUser?.id ?? currentUser?._id ?? 20,
@@ -237,6 +261,9 @@ export default function ProposalCreation() {
     setAgentDownloadUrl("");
     setAgentDownloadFileName("");
     setLastSocketOutputType("");
+    setIsAgentInProgress(false);
+    setShowInitialQuickActions(false);
+    setHasCompletedInitialQuickAction(false);
   }, [sessionId]);
 
   useEffect(() => {
@@ -302,6 +329,7 @@ export default function ProposalCreation() {
       isSocketConnectedRef.current = false;
       setIsSocketConnected(false);
       setAiTyping(false);
+      setIsAgentInProgress(false);
       setShowSocketIssuePopup(true);
     };
 
@@ -309,6 +337,7 @@ export default function ProposalCreation() {
       isSocketConnectedRef.current = false;
       setIsSocketConnected(false);
       setAiTyping(false);
+      setIsAgentInProgress(false);
       setShowSocketIssuePopup(true);
     };
 
@@ -319,12 +348,20 @@ export default function ProposalCreation() {
     const handleAiMessage = (payload) => {
       const socketMessageType = String(payload?.type || "").toLowerCase();
       const text = payload?.message ?? payload?.text;
+      if (socketMessageType === "agent_in_progress") {
+        if (socketMessageType) {
+          setLastSocketOutputType(socketMessageType);
+        }
+        setIsAgentInProgress(true);
+        return;
+      }
 
       if (socketMessageType === "download_file") {
         if (socketMessageType) {
           setLastSocketOutputType(socketMessageType);
         }
         setAiTyping(false);
+        setIsAgentInProgress(false);
         const url = extractProposalAgentDownloadUrl(payload, text);
         const textStr = text != null ? String(text).trim() : "";
         if (!url && !textStr) return;
@@ -356,6 +393,7 @@ export default function ProposalCreation() {
         setLastSocketOutputType(socketMessageType);
       }
       setAiTyping(false);
+      setIsAgentInProgress(false);
       if (socketMessageType === "agent_output") {
         setAgentOutputContent((prev) =>
           prev ? `${prev}\n\n${String(text)}` : String(text),
@@ -392,6 +430,19 @@ export default function ProposalCreation() {
     }
     loadFilesList();
   }, [activeTab, sessionId]);
+
+  useEffect(() => {
+    if (!sessionId) return;
+    loadFilesList();
+  }, [sessionId]);
+
+  useEffect(() => {
+    if (!sessionId || !isAnyDocumentInProgress) return undefined;
+    const timer = setInterval(() => {
+      loadFilesList();
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [sessionId, isAnyDocumentInProgress]);
 
   useEffect(() => {
     if (!documentsMenuOpenId) return undefined;
@@ -526,7 +577,7 @@ export default function ProposalCreation() {
   };
 
   const handleSendMessage = () => {
-    if (aiTyping) return;
+    if (aiTyping || isAgentInProgress || isAnyDocumentInProgress) return;
     if (!replyText.trim()) return;
     const userMessage = replyText.trim();
     const outgoingMessageType =
@@ -558,6 +609,29 @@ export default function ProposalCreation() {
 
     if (flowState === "review") {
       setFlowState("regenerating");
+    }
+  };
+
+  const handleQuickActionSelect = (value) => {
+    if (!value) return;
+    if (aiTyping || isAgentInProgress || isAnyDocumentInProgress) return;
+    setSelectedQuickAction(value);
+    setShowInitialQuickActions(false);
+    setHasCompletedInitialQuickAction(true);
+    setMessages((prev) => [...prev, { role: "user", text: value }]);
+    const outgoingMessageType =
+      lastSocketOutputType === "hil_input" ? "hil_input" : "user_input";
+    const sent = emitProposalChatMessage({
+      message: value,
+      type: "user_input",
+      meta: {
+        messageType: outgoingMessageType,
+        clientName,
+        fileType,
+      },
+    });
+    if (sent) {
+      setAiTyping(true);
     }
   };
 
@@ -658,6 +732,9 @@ export default function ProposalCreation() {
         { role: "user-file", name: file.name, size: `${sizeMB} MB`, ext },
       ];
     });
+    if (!hasCompletedInitialQuickAction) {
+      setShowInitialQuickActions(true);
+    }
     setFlowState("supporting-docs");
     emitProposalChatMessage({
       message: file.name,
@@ -1511,7 +1588,7 @@ export default function ProposalCreation() {
               ) : (
                 <>
                   {/* Uploaded file chip */}
-                  {fileName && (
+                  {chatFileName && (
                     <div className="pcr-file-bubble">
                       <div className="pcr-file-icon">
                         <svg
@@ -1543,9 +1620,11 @@ export default function ProposalCreation() {
                         </svg>
                       </div>
                       <div className="pcr-file-info">
-                        <span className="pcr-file-name">{fileName}</span>
+                        <span className="pcr-file-name">{chatFileName}</span>
                         <span className="pcr-file-status">
-                          {t("proposalCreation.uploaded")}
+                          {isAnyDocumentInProgress
+                            ? t("createProposal.uploading")
+                            : t("proposalCreation.uploaded")}
                         </span>
                       </div>
                     </div>
@@ -1823,10 +1902,43 @@ export default function ProposalCreation() {
               <div ref={chatEndRef} />
             </div>
 
+            {isAnyDocumentInProgress &&
+              activeTab !== "documents" &&
+              activeTab !== "outline" && (
+                <p className="pcr-upload-wait-message">
+                  File is uploading, please wait.
+                </p>
+              )}
+
+            {/* Initial quick actions after first file upload */}
+            {showInitialQuickActions &&
+              !isAnyDocumentInProgress &&
+              activeTab !== "documents" &&
+              activeTab !== "outline" && (
+                <div className="pcr-quick-actions">
+                  {quickActions.map((action) => (
+                    <button
+                      key={action}
+                      type="button"
+                      className={`pcr-quick-action-btn${
+                        selectedQuickAction === action
+                          ? " pcr-quick-action-btn--active"
+                          : ""
+                      }`}
+                      onClick={() => handleQuickActionSelect(action)}
+                      disabled={!isSocketConnected || aiTyping || isAgentInProgress}
+                    >
+                      {action}
+                    </button>
+                  ))}
+                </div>
+              )}
+
             {/* Reply input */}
             {canShowPromptField &&
               activeTab !== "documents" &&
-              activeTab !== "outline" && (
+              activeTab !== "outline" &&
+              !showInitialQuickActions && (
                 <div
                   className={`pcr-reply-bar${isDragOver ? " pcr-reply-bar--dragover" : ""}`}
                   onDragOver={handleChatDragOver}
@@ -1842,7 +1954,12 @@ export default function ProposalCreation() {
                         className="pcr-reply-input"
                         placeholder={t("proposalCreation.replyPlaceholder")}
                         value={replyText}
-                        disabled={!isSocketConnected || aiTyping}
+                        disabled={
+                          !isSocketConnected ||
+                          aiTyping ||
+                          isAgentInProgress ||
+                          isAnyDocumentInProgress
+                        }
                         onChange={(e) => handleReplyInputChange(e.target.value)}
                         onKeyDown={handleKeyDown}
                       />
@@ -1854,7 +1971,9 @@ export default function ProposalCreation() {
                           disabled={
                             isUploadingSupportFile ||
                             !isSocketConnected ||
-                            aiTyping
+                            aiTyping ||
+                            isAgentInProgress ||
+                            isAnyDocumentInProgress
                           }
                           onClick={openChatUploadModal}
                         >
@@ -1878,7 +1997,11 @@ export default function ProposalCreation() {
                           className="pcr-reply-icon-btn"
                           aria-label="Send"
                           disabled={
-                            !isSocketConnected || !replyText.trim() || aiTyping
+                            !isSocketConnected ||
+                            !replyText.trim() ||
+                            aiTyping ||
+                            isAgentInProgress ||
+                            isAnyDocumentInProgress
                           }
                           onClick={handleSendMessage}
                         >
