@@ -91,7 +91,9 @@ function formatDateAsYyyyMmDd(value) {
 }
 
 function isDocumentInProgressStatus(status) {
-  const normalized = String(status || "").trim().toLowerCase();
+  const normalized = String(status || "")
+    .trim()
+    .toLowerCase();
   if (!normalized) return false;
   return (
     normalized.includes("progress") ||
@@ -184,9 +186,7 @@ export default function ProposalCreation() {
   const [showInitialQuickActions, setShowInitialQuickActions] = useState(false);
   const [hasCompletedInitialQuickAction, setHasCompletedInitialQuickAction] =
     useState(false);
-  const [selectedQuickAction, setSelectedQuickAction] = useState(
-    quickActions[1] || quickActions[0] || "",
-  );
+  const [selectedQuickAction, setSelectedQuickAction] = useState("");
   const uploadFileMutation = useUploadFileMutation();
 
   const previewTitle = `${proposalName === "Untitled Proposal" ? "Wooribank" : proposalName} Requirements Analysis`;
@@ -198,6 +198,9 @@ export default function ProposalCreation() {
   );
   const isAnyDocumentInProgress = Boolean(inProgressDocument);
   const chatFileName = inProgressDocument?.name || fileName;
+  const hasUserTypedMessage =
+    Boolean(replyText.trim()) || messages.some((msg) => msg.role === "user");
+  const wasAnyDocumentInProgressRef = useRef(false);
   const currentUser = getStoredUser();
   const userId = Number(
     currentUser?.user_id ?? currentUser?.id ?? currentUser?._id ?? 20,
@@ -246,6 +249,7 @@ export default function ProposalCreation() {
       const result = await fetchFilesList({
         user_id: userId,
         session_id: sessionId,
+        client_name: clientName,
       });
       setFetchedDocuments(normalizeFetchedFiles(result));
     } catch (error) {
@@ -443,6 +447,38 @@ export default function ProposalCreation() {
     }, 5000);
     return () => clearInterval(timer);
   }, [sessionId, isAnyDocumentInProgress]);
+
+  useEffect(() => {
+    const wasInProgress = wasAnyDocumentInProgressRef.current;
+    if (
+      wasInProgress &&
+      !isAnyDocumentInProgress &&
+      activeTab === "ai-chat" &&
+      chatFileName
+    ) {
+      setMessages((prev) => [
+        ...prev,
+        { role: "ai", text: t("proposalCreation.fileUploadComplete") },
+      ]);
+    }
+    wasAnyDocumentInProgressRef.current = isAnyDocumentInProgress;
+  }, [isAnyDocumentInProgress, activeTab, chatFileName, t]);
+
+  useEffect(() => {
+    if (activeTab !== "ai-chat") return;
+    if (hasCompletedInitialQuickAction) return;
+    if (!chatFileName || isAnyDocumentInProgress || hasUserTypedMessage) {
+      setShowInitialQuickActions(false);
+      return;
+    }
+    setShowInitialQuickActions(true);
+  }, [
+    activeTab,
+    chatFileName,
+    isAnyDocumentInProgress,
+    hasUserTypedMessage,
+    hasCompletedInitialQuickAction,
+  ]);
 
   useEffect(() => {
     if (!documentsMenuOpenId) return undefined;
@@ -732,7 +768,7 @@ export default function ProposalCreation() {
         { role: "user-file", name: file.name, size: `${sizeMB} MB`, ext },
       ];
     });
-    if (!hasCompletedInitialQuickAction) {
+    if (!hasCompletedInitialQuickAction && !hasUserTypedMessage) {
       setShowInitialQuickActions(true);
     }
     setFlowState("supporting-docs");
@@ -1905,9 +1941,27 @@ export default function ProposalCreation() {
             {isAnyDocumentInProgress &&
               activeTab !== "documents" &&
               activeTab !== "outline" && (
-                <p className="pcr-upload-wait-message">
-                  File is uploading, please wait.
-                </p>
+                <div className="pcr-ai-message">
+                  <div className="pcr-ai-avatar">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                      <path
+                        d="M10 2l1.5 3.5L15 7l-3.5 1.5L10 12l-1.5-3.5L5 7l3.5-1.5L10 2z"
+                        fill="#2189FF"
+                      />
+                      <path
+                        d="M15 12l1 2 2 1-2 1-1 2-1-2-2-1 2-1 1-2z"
+                        fill="#2189FF"
+                      />
+                      <path
+                        d="M4 14l.75 1.5L6 16.25l-1.25.75L4 18.5l-.75-1.5L2 16.25l1.25-.75L4 14z"
+                        fill="#2189FF"
+                      />
+                    </svg>
+                  </div>
+                  <div className="pcr-ai-text">
+                    <p>{t("proposalCreation.fileUploadInProgress")}</p>
+                  </div>
+                </div>
               )}
 
             {/* Initial quick actions after first file upload */}
@@ -1926,7 +1980,9 @@ export default function ProposalCreation() {
                           : ""
                       }`}
                       onClick={() => handleQuickActionSelect(action)}
-                      disabled={!isSocketConnected || aiTyping || isAgentInProgress}
+                      disabled={
+                        !isSocketConnected || aiTyping || isAgentInProgress
+                      }
                     >
                       {action}
                     </button>

@@ -1,13 +1,13 @@
-import { apiClient } from '../api';
+import { apiClient } from "../api";
 
 export const fetchFiles = async (params = {}) => {
-  const response = await apiClient.get('/file', { params });
+  const response = await apiClient.get("/file", { params });
   return response.data;
 };
 
 export const uploadFile = async (file, extraFields = {}, isTest = false) => {
   if (!file) {
-    throw new Error('file is required');
+    throw new Error("file is required");
   }
 
   if (isTest) {
@@ -20,7 +20,7 @@ export const uploadFile = async (file, extraFields = {}, isTest = false) => {
   }
 
   const formData = new FormData();
-  formData.append('file', file);
+  formData.append("file", file);
 
   Object.entries(extraFields).forEach(([key, value]) => {
     if (value !== undefined && value !== null) {
@@ -28,9 +28,9 @@ export const uploadFile = async (file, extraFields = {}, isTest = false) => {
     }
   });
 
-  const response = await apiClient.post('/file-upload', formData, {
+  const response = await apiClient.post("/file-upload", formData, {
     headers: {
-      'Content-Type': 'multipart/form-data',
+      "Content-Type": "multipart/form-data",
     },
   });
 
@@ -39,24 +39,29 @@ export const uploadFile = async (file, extraFields = {}, isTest = false) => {
 
 export const fetchFileById = async (fileId, config = {}) => {
   if (!fileId) {
-    throw new Error('fileId is required');
+    throw new Error("fileId is required");
   }
 
   const response = await apiClient.get(`/file/${fileId}`, config);
   return response.data;
 };
 
-export const fetchFilesList = async ({ user_id, session_id } = {}) => {
+export const fetchFilesList = async ({
+  user_id,
+  session_id,
+  client_name,
+} = {}) => {
   if (!user_id && user_id !== 0) {
-    throw new Error('user_id is required');
+    throw new Error("user_id is required");
   }
   if (!session_id) {
-    throw new Error('session_id is required');
+    throw new Error("session_id is required");
   }
 
-  const response = await apiClient.post('/fetch-files-list', {
+  const response = await apiClient.post("/fetch-files-list", {
     user_id,
     session_id,
+    client_name,
   });
   return response.data;
 };
