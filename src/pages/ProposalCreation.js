@@ -263,7 +263,7 @@ export default function ProposalCreation() {
       id: item?.id ?? item?.file_id ?? `${item?.name || "file"}-${idx}`,
       name: item?.name || item?.file_name || `File ${idx + 1}`,
       type: inferDocType(item?.name || item?.file_name || "", item?.file_type),
-      source: item?.source || "User",
+      source: item?.uploaded_by || "User",
       status: item?.status || "-",
     }));
   };
@@ -1278,6 +1278,12 @@ export default function ProposalCreation() {
   );
 
   const renderDocumentsTab = () => {
+    const formatSourceLabel = (value) => {
+      const raw = String(value || "-").trim();
+      if (!raw || raw === "-") return "-";
+      return raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
+    };
+
     const formatStatusLabel = (value) => {
       const raw = String(value || "-").trim();
       if (!raw || raw === "-") return "-";
@@ -1391,7 +1397,9 @@ export default function ProposalCreation() {
                 </span>
               </div>
               <div className="pcr-doctab-col-source">
-                <span className="pcr-doctab-source">{doc.source}</span>
+                <span className="pcr-doctab-source">
+                  {formatSourceLabel(doc.source)}
+                </span>
               </div>
               <div className="pcr-doctab-col-status">
                 <span className="pcr-doctab-status">
