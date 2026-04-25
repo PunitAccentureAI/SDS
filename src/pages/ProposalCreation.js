@@ -210,6 +210,8 @@ export default function ProposalCreation() {
   const [showUploadCompleteMessage, setShowUploadCompleteMessage] =
     useState(false);
   const [hasLoadedFilesListOnce, setHasLoadedFilesListOnce] = useState(false);
+  const [hasPendingChatUploadFlow, setHasPendingChatUploadFlow] =
+    useState(false);
   const uploadFileMutation = useUploadFileMutation();
 
   const previewTitle = `${proposalName === "Untitled Proposal" ? "Wooribank" : proposalName} Requirements Analysis`;
@@ -224,6 +226,8 @@ export default function ProposalCreation() {
   const hasUserTypedMessage =
     Boolean(replyText.trim()) || messages.some((msg) => msg.role === "user");
   const wasAnyDocumentInProgressRef = useRef(false);
+  const showFileIngestionInProgressMessage =
+    hasPendingChatUploadFlow && (isUploadingSupportFile || isAnyDocumentInProgress);
   const currentUser = getStoredUser();
   const userId = Number(
     currentUser?.user_id ?? currentUser?.id ?? currentUser?._id ?? 20,
@@ -294,6 +298,7 @@ export default function ProposalCreation() {
     setHasCompletedInitialQuickAction(false);
     setShowUploadCompleteMessage(false);
     setHasLoadedFilesListOnce(false);
+    setHasPendingChatUploadFlow(false);
   }, [sessionId]);
 
   useEffect(() => {
@@ -503,15 +508,22 @@ export default function ProposalCreation() {
   useEffect(() => {
     const wasInProgress = wasAnyDocumentInProgressRef.current;
     if (
+      hasPendingChatUploadFlow &&
       wasInProgress &&
       !isAnyDocumentInProgress &&
-      activeTab === "ai-chat" &&
-      chatFileName
+      !isUploadingSupportFile &&
+      activeTab === "ai-chat"
     ) {
       setShowUploadCompleteMessage(true);
+      setHasPendingChatUploadFlow(false);
     }
     wasAnyDocumentInProgressRef.current = isAnyDocumentInProgress;
-  }, [isAnyDocumentInProgress, activeTab, chatFileName, t]);
+  }, [
+    isAnyDocumentInProgress,
+    isUploadingSupportFile,
+    activeTab,
+    hasPendingChatUploadFlow,
+  ]);
 
   useEffect(() => {
     if (!showUploadCompleteMessage) return undefined;
@@ -810,19 +822,26 @@ export default function ProposalCreation() {
     }
     const validationError = validateSupportFile(file);
     if (validationError) throw new Error(validationError);
+    setHasPendingChatUploadFlow(true);
 
     const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
     const ext = inferDocType(file.name);
-    const uploadedFile = await uploadFileMutation.mutateAsync({
-      file,
-      extraFields: {
-        user_id: String(userId),
-        client_name: clientName,
-        file_type: selectedFileType || "requirement_analysis",
-        session_id: sessionId,
-      },
-      isTest: false,
-    });
+    let uploadedFile;
+    try {
+      uploadedFile = await uploadFileMutation.mutateAsync({
+        file,
+        extraFields: {
+          user_id: String(userId),
+          client_name: clientName,
+          file_type: selectedFileType || "requirement_analysis",
+          session_id: sessionId,
+        },
+        isTest: false,
+      });
+    } catch (error) {
+      setHasPendingChatUploadFlow(false);
+      throw error;
+    }
     const normalizedFile = normalizeUploadedFile(uploadedFile, file);
 
     //setSupportFiles([normalizedFile]);
@@ -2006,7 +2025,7 @@ export default function ProposalCreation() {
               <div ref={chatEndRef} />
             </div>
 
-            {isAnyDocumentInProgress &&
+            {showFileIngestionInProgressMessage &&
               activeTab !== "documents" &&
               activeTab !== "outline" && (
                 <div className="pcr-ai-message">
