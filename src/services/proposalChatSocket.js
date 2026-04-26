@@ -199,23 +199,14 @@ export const createProposalChatSocket = ({
 
     if (eventName === PROPOSAL_CHAT_SOCKET_EVENTS.SEND_MESSAGE) {
       const messageType = payload?.messageType || "user_input";
-      const messagePayload =
-        messageType === "hil_input"
-          ? {
-              type: "hil_input",
-              user_id: userId,
-              input: payload?.message || "",
-              client_name: payload?.clientName || clientName || "",
-              message_id: ++messageId,
-            }
-          : {
-              user_id: userId,
-              type: "user_input",
-              input: payload?.message || "",
-              client_name: payload?.clientName || clientName || "",
-              message_id: ++messageId,
-              file_type: payload?.fileType || fileType || "",
-            };
+      const messagePayload = {
+        user_id: userId,
+        type: messageType,
+        input: payload?.message || "",
+        client_name: payload?.clientName || clientName || "",
+        message_id: ++messageId,
+        file_type: payload?.fileType || fileType || "",
+      };
       ws.send(JSON.stringify(messagePayload));
       return;
     }
